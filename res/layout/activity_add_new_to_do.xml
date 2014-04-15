@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".AddNewToDoActivity"
+    android:orientation="vertical"
+    android:background="@color/background_grey" >
+
+    <EditText 
+        android:id="@+id/newToDo_task_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/newToDo_task_title" />
+    
+     <EditText 
+        android:id="@+id/newToDo_deadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/newToDo_deadline" />
+     
+     <EditText 
+        android:id="@+id/newToDo_alert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/newToDo_alert"
+        android:focusableInTouchMode="false"     />
+     
+     <EditText 
+        android:id="@+id/newToDo_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/newToDo_location" />
+     
+     <EditText 
+        android:id="@+id/newToDo_notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/newToDo_notes"
+        android:lines="6"
+        android:gravity="top|left"
+        android:background="#ffffff"/>
+
+</LinearLayout>
