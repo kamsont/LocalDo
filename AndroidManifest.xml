@@ -45,6 +45,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.kamson.AddNewToDoActivity" />
         </activity>
+        <activity
+            android:name="de.kamson.localdo.AddLocationActivity"
+            android:label="@string/title_activity_set_location" >
+            <!-- <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.kamson.AddNewToDoActivity" /> -->
+        </activity>
          <meta-data 
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyB0hWLF3JwiVusiz0h_RBXoDuEUzGF8dMI"/>

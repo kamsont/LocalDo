@@ -16,24 +16,99 @@
         android:layout_height="wrap_content"
         android:hint="@string/newToDo_task_title" />
     
-     <EditText 
-        android:id="@+id/newToDo_deadline"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/newToDo_deadline" />
+    	android:layout_height="wrap_content"
+    	android:background="@color/background_grey"
+        android:orientation="horizontal">
+        
+     	<EditText 
+	        android:id="@+id/newToDo_deadlineDate"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:hint="@string/newToDo_deadline"
+	        android:onClick="showDatePickerDialog"
+	        android:focusableInTouchMode="false" />
+	     
+	     <EditText 
+	        android:id="@+id/newToDo_deadlineTime"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:hint="@string/newToDo_deadlineTime"
+	        android:onClick="showTimePickerDialog"
+	        android:focusableInTouchMode="false"/>
+     </LinearLayout>
      
-     <EditText 
-        android:id="@+id/newToDo_alert"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/newToDo_alert"
-        android:focusableInTouchMode="false"     />
-     
+    	android:layout_height="wrap_content"
+    	android:background="@color/background_grey"
+        android:orientation="horizontal">
+	    
+        <CheckBox
+	        android:id="@+id/newToDo_checkbox_alertTime"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/checkbox_alertTime"
+	        android:visibility="gone" />
+	     
+	     <Spinner
+            android:id="@+id/newToDo_spinner_alertTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/setAlert_deadlineTimes_array"
+            android:prompt="@string/setAlert_deadlineTime_spinner_prompt"
+            android:visibility="gone"
+             />
+	 </LinearLayout>
+	     
      <EditText 
         android:id="@+id/newToDo_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/newToDo_location" />
+        android:hint="@string/newToDo_location"
+        android:onClick="openSetLocation"
+        android:focusableInTouchMode="false" />
+     
+     <LinearLayout
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:background="@color/background_grey"
+        android:orientation="horizontal">
+	    
+        <CheckBox
+	        android:id="@+id/newToDo_checkbox_alertLocation"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/checkbox_alertLocation"
+	        android:visibility="gone" />
+	     
+	     <Spinner
+            android:id="@+id/newToDo_spinner_alertLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/setAlert_distances_array"
+            android:prompt="@string/setAlert_distance_spinner_prompt"
+            android:visibility="gone"
+             />
+	 </LinearLayout>
+	 
+     <EditText 
+        android:id="@+id/newToDo_color"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/newToDo_color"
+        android:onClick="showColorSpinnerDialog"
+        android:focusableInTouchMode="false" />
+     
+     <Spinner
+        android:id="@+id/newToDo_color_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:entries="@array/setColor_array"
+        android:prompt="@string/setColor_spinner_prompt"
+        android:visibility="invisible"
+        android:spinnerMode="dialog"/>
      
      <EditText 
         android:id="@+id/newToDo_notes"
