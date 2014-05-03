@@ -13,17 +13,30 @@
     <string name="active_tasks_title">2 tasks to do</string>
     <string name="finished_tasks_title">2 tasks finished</string>
     <string name="title_activity_add_new_to_do">New To-Do</string>
+    <string name="title_activity_set_location">Set Location</string>
     <string name="title_activity_main">All To-Dos</string>
     <string name="newToDo_task_title">Title of task</string>
     <string name="newToDo_deadline">Select deadline</string>
+    <string name="newToDo_deadlineTime">Time</string>
     <string name="newToDo_alert">Set alert</string>
     <string name="newToDo_location">Add location</string>
+    <string name="newToDo_color">Choose color</string>
     <string name="newToDo_notes">Notes...</string>
     <string name="title_activity_set_alert">Set alert</string>
     <string name="setAlert_remind_when">Remind me when...</string>
     <string name="setAlert_remind_by">Remind me by...</string>
     <string name="setAlert_distanceToLoaction">Distance to location:</string>
     <string name="setAlert_timeToDeadline">Time to deadline</string>
+    <string name="setColor_spinner_prompt">Choose color</string>
+    <string name="checkbox_alertTime">Deadline alert:</string>
+    <string name="checkbox_alertLocation">Location alert:</string>
+    <string-array name="setColor_array">
+		<item>No color</item>   
+        <item>Red</item>
+        <item>Green</item>
+        <item>Yellow</item>
+        <item>Blue</item>
+    </string-array>
     <string name="setAlert_distance_spinner_prompt">Choose distance</string>
     <string-array name="setAlert_distances_array">
         <item>20m</item>
@@ -32,17 +45,18 @@
     </string-array>
     <string name="setAlert_deadlineTime_spinner_prompt">Choose distance</string>
     <string-array name="setAlert_deadlineTimes_array">
-        <item>5min</item>
-        <item>10min</item>
-        <item>30min</item>
-        <item>1h</item>
-        <item>4h</item>
-        <item>12h</item>
-        <item>1d</item>
-        <item>2d</item>
-        <item>7d</item>
+        <item>5 min</item>
+        <item>10 min</item>
+        <item>30 min</item>
+        <item>1 h</item>
+        <item>4 h</item>
+        <item>12 h</item>
+        <item>1 days</item>
+        <item>2 days</item>
+        <item>7 days</item>
     </string-array>
 	<string name="setAlert_sound">Sound</string>
 	<string name="setAlert_vibration">Vibration</string>
 	<string name="setAlert_pushNotification">Push Notification</string>
+	
 </resources>
