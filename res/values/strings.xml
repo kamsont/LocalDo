@@ -20,6 +20,7 @@
     <string name="newToDo_deadlineTime">Time</string>
     <string name="newToDo_alert">Set alert</string>
     <string name="newToDo_location">Add location</string>
+    <string name="newToDo_location_spinner_prompt">Choose location</string>
     <string name="newToDo_color">Choose color</string>
     <string name="newToDo_notes">Notes...</string>
     <string name="title_activity_set_alert">Set alert</string>

@@ -147,7 +147,7 @@ public class AddNewToDoActivity extends Activity {
 		Intent intent = new Intent(getApplicationContext(), SetAlertActivity.class);
 		startActivity(intent);
 	}
-	
+		
 	public void openSetLocation(View view) {
 		Intent intent = new Intent(getApplicationContext(), AddLocationActivity.class);
 		startActivity(intent);
@@ -158,6 +158,13 @@ public class AddNewToDoActivity extends Activity {
 		//Toast.makeText(getApplicationContext(), "spinner", Toast.LENGTH_SHORT).show();
 		colorSpinner.performClick();
 	}
+	
+	public void showLocationSpinnerDialog (View v) {
+		Spinner locationSpinner = (Spinner)findViewById(R.id.newToDo_location_spinner); 
+		Toast.makeText(getApplicationContext(), "spinner", Toast.LENGTH_SHORT).show();
+		locationSpinner.performClick();
+	}
+	
 	
 	public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 		
@@ -198,7 +205,7 @@ public class AddNewToDoActivity extends Activity {
 			et_deadlineDate.setText(day + "." + (month+1) + "." + year);
 			et_deadlineDate.setLayoutParams(new LinearLayout.LayoutParams(0,LayoutParams.WRAP_CONTENT,1));
 			et_deadlineTime.setLayoutParams(new LinearLayout.LayoutParams(0,LayoutParams.MATCH_PARENT, 1));
-			//et_deadlineTime.setVisibility(View.VISIBLE);
+			et_deadlineTime.setVisibility(View.VISIBLE);
 			//et_deadlineTime.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 			
 		}

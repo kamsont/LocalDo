@@ -18,9 +18,9 @@
     
     <LinearLayout
         android:layout_width="match_parent"
-    	android:layout_height="wrap_content"
-    	android:background="@color/background_grey"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:background="@color/background_grey"
+        android:orientation="horizontal" >
         
      	<EditText 
 	        android:id="@+id/newToDo_deadlineDate"
@@ -30,13 +30,15 @@
 	        android:onClick="showDatePickerDialog"
 	        android:focusableInTouchMode="false" />
 	     
-	     <EditText 
-	        android:id="@+id/newToDo_deadlineTime"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:hint="@string/newToDo_deadlineTime"
-	        android:onClick="showTimePickerDialog"
-	        android:focusableInTouchMode="false"/>
+	     <EditText
+	         android:id="@+id/newToDo_deadlineTime"
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+	         android:focusableInTouchMode="false"
+	         android:hint="@string/newToDo_deadlineTime"
+	         android:onClick="showTimePickerDialog"
+	         android:visibility="gone" />
+
      </LinearLayout>
      
     <LinearLayout
@@ -67,8 +69,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/newToDo_location"
-        android:onClick="openSetLocation"
+        android:onClick="showLocationSpinnerDialog"
         android:focusableInTouchMode="false" />
+     
+     <Spinner
+            android:id="@+id/newToDo_location_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/setAlert_deadlineTimes_array"
+            android:prompt="@string/newToDo_location_spinner_prompt"
+            android:visibility="gone"
+            android:spinnerMode="dialog"/>
      
      <LinearLayout
         android:layout_width="match_parent"
@@ -90,6 +101,7 @@
             android:entries="@array/setAlert_distances_array"
             android:prompt="@string/setAlert_distance_spinner_prompt"
             android:visibility="gone"
+            android:spinnerMode="dialog"
              />
 	 </LinearLayout>
 	 
