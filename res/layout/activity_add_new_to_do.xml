@@ -36,6 +36,7 @@
 	        android:layout_height="wrap_content"
 	        android:hint="@string/newToDo_deadlineTime"
 	        android:onClick="showTimePickerDialog"
+	        android:visibility="gone"
 	        android:focusableInTouchMode="false"/>
      </LinearLayout>
      
@@ -67,7 +68,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/newToDo_location"
-        android:onClick="openSetLocation"
+        android:onClick="showMyDialog"
         android:focusableInTouchMode="false" />
      
      <LinearLayout
@@ -107,7 +108,16 @@
         android:layout_height="wrap_content" 
         android:entries="@array/setColor_array"
         android:prompt="@string/setColor_spinner_prompt"
-        android:visibility="invisible"
+        android:visibility="gone"
+        android:spinnerMode="dialog"/>
+     
+     <Spinner
+        android:id="@+id/newToDo_location_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:entries="@array/newToDo_locations_array"
+        android:prompt="@string/newToDo_location_spinner_prompt"
+        android:visibility="gone"
         android:spinnerMode="dialog"/>
      
      <EditText 

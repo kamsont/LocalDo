@@ -19,7 +19,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >       
+        android:theme="@style/AppTheme"
+        android:name="de.kamson.localdo.GlobalState" >       
         <activity
             android:name="de.kamson.localdo.MainActivity"
             android:label="@string/app_name" >
@@ -32,25 +33,31 @@
         <activity
             android:name="de.kamson.localdo.AddNewToDoActivity"
             android:label="@string/title_activity_add_new_to_do"
-            android:parentActivityName="de.kamson.MainActivity" >
+            android:parentActivityName="de.kamson.localdo.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.kamson.MainActivity" />
+                android:value="de.kamson.localdo.MainActivity" />
         </activity>
         <activity
             android:name="de.kamson.localdo.SetAlertActivity"
             android:label="@string/title_activity_set_alert"
-            android:parentActivityName="de.kamson.AddNewToDoActivity" >
+            android:parentActivityName="de.kamson.localdo.AddNewToDoActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.kamson.AddNewToDoActivity" />
+                android:value="de.kamson.localdo.AddNewToDoActivity" />
         </activity>
+        <service
+		    android:name="de.kamson.localdo.ReceiveTransitionsIntentService"
+		    android:label="@string/app_name"
+		    android:exported="false">
+		</service>
         <activity
             android:name="de.kamson.localdo.AddLocationActivity"
-            android:label="@string/title_activity_set_location" >
-            <!-- <meta-data
+            android:label="@string/title_activity_set_location"
+            android:parentActivityName="de.kamson.localdo.AddNewToDoActivity" >
+            <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.kamson.AddNewToDoActivity" /> -->
+                android:value="de.kamson.localdo.AddNewToDoActivity" />
         </activity>
          <meta-data 
             android:name="com.google.android.maps.v2.API_KEY"

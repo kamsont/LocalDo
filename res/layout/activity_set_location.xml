@@ -9,5 +9,61 @@
     tools:context=".AddLocationActivity"
     android:orientation="vertical"
     android:background="@color/background_grey" >
-
+  
+	<EditText 
+	    android:id="@+id/location_name" 
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:hint="@string/location_name" />
+	
+	<EditText 
+	    android:id="@+id/location_address" 
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:hint="@string/location_address" />
+	
+	
+    <CheckBox 
+        android:id="@+id/addLocation_cb_addLocationToList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/addLocation_cb_addLocationToList" 
+        android:checked="true" />     
+	
+	
+	
+	<fragment 
+	  android:id="@+id/map"
+	  android:name="com.google.android.gms.maps.MapFragment"
+	  android:layout_width="match_parent"
+	  android:layout_height="0dp"
+	  android:layout_weight="1" />
+	
+	<CheckBox 
+        android:id="@+id/addLocation_cb_setAlert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/addLocation_cb_setAlert"/>
+	
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal">
+		<TextView 
+		    android:id="@+id/addLocation_distanceToLocation"
+		    android:layout_width="0dp"
+		    android:layout_height="wrap_content"
+		    android:text="@string/addLocation_distanceToLocation"
+		    android:layout_weight="1"/>
+		<Spinner
+            android:id="@+id/addLocation_spinner_distance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:entries="@array/setAlert_distances_array"
+            android:prompt="@string/setAlert_distance_spinner_prompt"  
+             />
+	</LinearLayout>
+	
+    
 </LinearLayout>

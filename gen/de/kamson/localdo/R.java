@@ -12,9 +12,10 @@ public final class R {
         public static final int move=0x7f040000;
     }
     public static final class array {
-        public static final int setAlert_deadlineTimes_array=0x7f0a0002;
-        public static final int setAlert_distances_array=0x7f0a0001;
-        public static final int setColor_array=0x7f0a0000;
+        public static final int newToDo_locations_array=0x7f0a0000;
+        public static final int setAlert_deadlineTimes_array=0x7f0a0003;
+        public static final int setAlert_distances_array=0x7f0a0002;
+        public static final int setColor_array=0x7f0a0001;
     }
     public static final class attr {
         /** 
@@ -227,29 +228,43 @@ containing a value of this type.
         public static final int common_signin_btn_text_pressed_light=0x7f020017;
         public static final int ic_action_accept=0x7f020018;
         public static final int ic_action_cancel=0x7f020019;
-        public static final int ic_action_new=0x7f02001a;
-        public static final int ic_launcher=0x7f02001b;
-        public static final int ic_plusone_medium_off_client=0x7f02001c;
-        public static final int ic_plusone_small_off_client=0x7f02001d;
-        public static final int ic_plusone_standard_off_client=0x7f02001e;
-        public static final int ic_plusone_tall_off_client=0x7f02001f;
+        public static final int ic_action_discard=0x7f02001a;
+        public static final int ic_action_edit=0x7f02001b;
+        public static final int ic_action_new=0x7f02001c;
+        public static final int ic_launcher=0x7f02001d;
+        public static final int ic_plusone_medium_off_client=0x7f02001e;
+        public static final int ic_plusone_small_off_client=0x7f02001f;
+        public static final int ic_plusone_standard_off_client=0x7f020020;
+        public static final int ic_plusone_tall_off_client=0x7f020021;
     }
     public static final class id {
-        public static final int action_accept=0x7f060029;
-        public static final int action_cancel=0x7f060028;
-        public static final int action_manageLocations=0x7f06002c;
-        public static final int action_new=0x7f06002a;
-        public static final int action_options=0x7f06002d;
-        public static final int action_sortBy=0x7f06002b;
-        public static final int active_tasks_list=0x7f060011;
-        public static final int active_tasks_title=0x7f060010;
-        public static final int checkBox1=0x7f060024;
-        public static final int colorBar=0x7f060027;
-        public static final int finished_tasks_list=0x7f060013;
-        public static final int finished_tasks_title=0x7f060012;
+        public static final int action_accept=0x7f060034;
+        public static final int action_cancel=0x7f060033;
+        public static final int action_discard=0x7f060035;
+        public static final int action_edit=0x7f060036;
+        public static final int action_manageLocations=0x7f060039;
+        public static final int action_new=0x7f060037;
+        public static final int action_options=0x7f06003a;
+        public static final int action_sortBy=0x7f060038;
+        public static final int active_tasks_list=0x7f060012;
+        public static final int active_tasks_title=0x7f060011;
+        public static final int addLocation_cb_addLocationToList=0x7f060027;
+        public static final int addLocation_cb_setAlert=0x7f060029;
+        public static final int addLocation_distanceToLocation=0x7f06002a;
+        public static final int addLocation_spinner_distance=0x7f06002b;
+        public static final int checkBox1=0x7f060031;
+        public static final int colorBar=0x7f060032;
+        public static final int finished_tasks_list=0x7f060014;
+        public static final int finished_tasks_title=0x7f060013;
         public static final int hybrid=0x7f060004;
-        public static final int label=0x7f060025;
-        public static final int label2=0x7f060026;
+        public static final int infowindow_info1=0x7f06002d;
+        public static final int infowindow_info2=0x7f06002e;
+        public static final int infowindow_title=0x7f06002c;
+        public static final int label=0x7f06002f;
+        public static final int label2=0x7f060030;
+        public static final int location_address=0x7f060026;
+        public static final int location_name=0x7f060025;
+        public static final int map=0x7f060028;
         public static final int newToDo_checkbox_alertLocation=0x7f06000b;
         public static final int newToDo_checkbox_alertTime=0x7f060008;
         public static final int newToDo_color=0x7f06000d;
@@ -257,29 +272,30 @@ containing a value of this type.
         public static final int newToDo_deadlineDate=0x7f060006;
         public static final int newToDo_deadlineTime=0x7f060007;
         public static final int newToDo_location=0x7f06000a;
-        public static final int newToDo_notes=0x7f06000f;
+        public static final int newToDo_location_spinner=0x7f06000f;
+        public static final int newToDo_notes=0x7f060010;
         public static final int newToDo_spinner_alertLocation=0x7f06000c;
         public static final int newToDo_spinner_alertTime=0x7f060009;
         public static final int newToDo_task_title=0x7f060005;
         public static final int none=0x7f060000;
         public static final int normal=0x7f060001;
         public static final int satellite=0x7f060002;
-        public static final int setAlert_date=0x7f060023;
-        public static final int setAlert_deadline=0x7f060018;
-        public static final int setAlert_deadline_checkbox=0x7f060017;
-        public static final int setAlert_deadline_spinner=0x7f060019;
-        public static final int setAlert_distance=0x7f060015;
-        public static final int setAlert_distance_checkbox=0x7f060014;
-        public static final int setAlert_distance_spinner=0x7f060016;
-        public static final int setAlert_notification_button=0x7f060021;
-        public static final int setAlert_pushNotification=0x7f060020;
-        public static final int setAlert_pushNotification_checkbox=0x7f06001f;
-        public static final int setAlert_remind_by=0x7f06001a;
-        public static final int setAlert_sound=0x7f06001c;
-        public static final int setAlert_sound_checkbox=0x7f06001b;
-        public static final int setAlert_time=0x7f060022;
-        public static final int setAlert_vibration=0x7f06001e;
-        public static final int setAlert_vibration_checkbox=0x7f06001d;
+        public static final int setAlert_date=0x7f060024;
+        public static final int setAlert_deadline=0x7f060019;
+        public static final int setAlert_deadline_checkbox=0x7f060018;
+        public static final int setAlert_deadline_spinner=0x7f06001a;
+        public static final int setAlert_distance=0x7f060016;
+        public static final int setAlert_distance_checkbox=0x7f060015;
+        public static final int setAlert_distance_spinner=0x7f060017;
+        public static final int setAlert_notification_button=0x7f060022;
+        public static final int setAlert_pushNotification=0x7f060021;
+        public static final int setAlert_pushNotification_checkbox=0x7f060020;
+        public static final int setAlert_remind_by=0x7f06001b;
+        public static final int setAlert_sound=0x7f06001d;
+        public static final int setAlert_sound_checkbox=0x7f06001c;
+        public static final int setAlert_time=0x7f060023;
+        public static final int setAlert_vibration=0x7f06001f;
+        public static final int setAlert_vibration_checkbox=0x7f06001e;
         public static final int terrain=0x7f060003;
     }
     public static final class integer {
@@ -290,25 +306,35 @@ containing a value of this type.
         public static final int activity_main=0x7f030001;
         public static final int activity_set_alert=0x7f030002;
         public static final int activity_set_location=0x7f030003;
-        public static final int rowlayout_active=0x7f030004;
-        public static final int rowlayout_finished=0x7f030005;
+        public static final int custom_info_window=0x7f030004;
+        public static final int rowlayout_active=0x7f030005;
+        public static final int rowlayout_finished=0x7f030006;
     }
     public static final class menu {
         public static final int add_location=0x7f0c0000;
         public static final int add_new_to_do=0x7f0c0001;
-        public static final int main=0x7f0c0002;
-        public static final int set_alert=0x7f0c0003;
+        public static final int edit_to_do=0x7f0c0002;
+        public static final int main=0x7f0c0003;
+        public static final int set_alert=0x7f0c0004;
     }
     public static final class string {
-        public static final int action_accept=0x7f07001e;
-        public static final int action_cancel=0x7f07001f;
-        public static final int action_manageLocations=0x7f070021;
-        public static final int action_new=0x7f07001d;
-        public static final int action_options=0x7f070022;
-        public static final int action_settings=0x7f07001c;
-        public static final int action_sortBy=0x7f070020;
-        public static final int active_tasks_title=0x7f070024;
-        public static final int app_name=0x7f07001b;
+        public static final int action_accept=0x7f07001d;
+        public static final int action_cancel=0x7f07001e;
+        public static final int action_discard=0x7f070020;
+        public static final int action_edit=0x7f07001f;
+        public static final int action_manageLocations=0x7f070022;
+        public static final int action_new=0x7f07001c;
+        public static final int action_options=0x7f070023;
+        public static final int action_settings=0x7f07001b;
+        public static final int action_sortBy=0x7f070021;
+        public static final int active_tasks_title=0x7f070025;
+        public static final int addLocation_cb_addLocationToList=0x7f070051;
+        public static final int addLocation_cb_setAlert=0x7f070052;
+        public static final int addLocation_distanceToLocation=0x7f070053;
+        public static final int add_geofences_already_requested_error=0x7f07002f;
+        public static final int add_geofences_result_failure=0x7f07002e;
+        public static final int add_geofences_result_success=0x7f07002d;
+        public static final int app_name=0x7f07001a;
         /**   Title for notification shown when GooglePlayServices needs to be
         enabled for a application to work. [CHAR LIMIT=70] 
          */
@@ -332,8 +358,8 @@ containing a value of this type.
         [CHAR LIMIT=70] 
          */
         public static final int auth_client_using_bad_version_title=0x7f070014;
-        public static final int checkbox_alertLocation=0x7f070037;
-        public static final int checkbox_alertTime=0x7f070036;
+        public static final int checkbox_alertLocation=0x7f070050;
+        public static final int checkbox_alertTime=0x7f07004f;
         /**  Button in confirmation dialog to enable Google Play services.  Clicking it
         will direct user to application settings of Google Play services where they
         can enable it [CHAR LIMIT=40] 
@@ -405,32 +431,52 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f070013;
-        public static final int finished_tasks_title=0x7f070025;
-        public static final int hello_world=0x7f070023;
-        /**  Location client code resources (prefix with location_client) 
-         */
-        public static final int location_client_powered_by_google=0x7f07001a;
-        public static final int newToDo_alert=0x7f07002c;
-        public static final int newToDo_color=0x7f07002e;
-        public static final int newToDo_deadline=0x7f07002a;
-        public static final int newToDo_deadlineTime=0x7f07002b;
-        public static final int newToDo_location=0x7f07002d;
-        public static final int newToDo_notes=0x7f07002f;
-        public static final int newToDo_task_title=0x7f070029;
-        public static final int setAlert_deadlineTime_spinner_prompt=0x7f070039;
-        public static final int setAlert_distanceToLoaction=0x7f070033;
-        public static final int setAlert_distance_spinner_prompt=0x7f070038;
-        public static final int setAlert_pushNotification=0x7f07003c;
-        public static final int setAlert_remind_by=0x7f070032;
-        public static final int setAlert_remind_when=0x7f070031;
-        public static final int setAlert_sound=0x7f07003a;
-        public static final int setAlert_timeToDeadline=0x7f070034;
-        public static final int setAlert_vibration=0x7f07003b;
-        public static final int setColor_spinner_prompt=0x7f070035;
-        public static final int title_activity_add_new_to_do=0x7f070026;
-        public static final int title_activity_main=0x7f070028;
-        public static final int title_activity_set_alert=0x7f070030;
-        public static final int title_activity_set_location=0x7f070027;
+        public static final int connected=0x7f070030;
+        public static final int connection_failed=0x7f070031;
+        public static final int disconnected=0x7f070032;
+        public static final int finished_tasks_title=0x7f070026;
+        public static final int geofence_transition_entered=0x7f070038;
+        public static final int geofence_transition_error_detail=0x7f070039;
+        public static final int geofence_transition_exited=0x7f07003a;
+        public static final int geofence_transition_invalid_type=0x7f07003b;
+        public static final int geofence_transition_notification_text=0x7f07003c;
+        public static final int geofence_transition_notification_title=0x7f07003d;
+        public static final int geofence_transition_unknown=0x7f07003e;
+        public static final int hello_world=0x7f070024;
+        public static final int infowindow_dialog=0x7f07004e;
+        public static final int infowindow_info2=0x7f07004d;
+        public static final int location_address=0x7f070047;
+        public static final int location_name=0x7f070046;
+        public static final int newToDo_alert=0x7f070042;
+        public static final int newToDo_color=0x7f070044;
+        public static final int newToDo_deadline=0x7f070040;
+        public static final int newToDo_deadlineTime=0x7f070041;
+        public static final int newToDo_location=0x7f070043;
+        public static final int newToDo_location_spinner_prompt=0x7f070054;
+        public static final int newToDo_notes=0x7f070045;
+        public static final int newToDo_task_title=0x7f07003f;
+        public static final int no_resolution=0x7f07002a;
+        public static final int play_services_available=0x7f07002b;
+        public static final int remove_geofences_already_requested_error=0x7f070034;
+        public static final int remove_geofences_id_failure=0x7f070033;
+        public static final int remove_geofences_id_success=0x7f070035;
+        public static final int remove_geofences_intent_failure=0x7f070036;
+        public static final int remove_geofences_intent_success=0x7f070037;
+        public static final int setAlert_deadlineTime_spinner_prompt=0x7f070057;
+        public static final int setAlert_distanceToLoaction=0x7f07004b;
+        public static final int setAlert_distance_spinner_prompt=0x7f070056;
+        public static final int setAlert_pushNotification=0x7f07005a;
+        public static final int setAlert_remind_by=0x7f07004a;
+        public static final int setAlert_remind_when=0x7f070049;
+        public static final int setAlert_sound=0x7f070058;
+        public static final int setAlert_timeToDeadline=0x7f07004c;
+        public static final int setAlert_vibration=0x7f070059;
+        public static final int setColor_spinner_prompt=0x7f070055;
+        public static final int title_activity_add_new_to_do=0x7f070027;
+        public static final int title_activity_main=0x7f070029;
+        public static final int title_activity_set_alert=0x7f070048;
+        public static final int title_activity_set_location=0x7f070028;
+        public static final int unknown_activity_request_code=0x7f07002c;
     }
     public static final class style {
         /** 
