@@ -64,13 +64,13 @@
         %1$s geofence(s) %2$s
     </string>
     <string name="geofence_transition_unknown">Unknown transition</string>
-    <string name="newToDo_task_title">Title of task</string>
-    <string name="newToDo_deadline">Select deadline</string>
-    <string name="newToDo_deadlineTime">Time</string>
-    <string name="newToDo_alert">Set alert</string>
-    <string name="newToDo_location">Add location</string>
-    <string name="newToDo_color">Choose color</string>
-    <string name="newToDo_notes">Notes...</string>
+    <string name="newTask_task_title">Title of task</string>
+    <string name="newTask_deadline">Select deadline</string>
+    <string name="newTask_deadlineTime">Time</string>
+    <string name="newTask_alert">Set alert</string>
+    <string name="newTask_location">Add location</string>
+    <string name="newTask_color">Choose color</string>
+    <string name="newTask_notes">Notes...</string>
     <string name="location_name">Name</string>
     <string name="location_address">Address</string>
     <string name="title_activity_set_alert">Set alert</string>
@@ -85,8 +85,8 @@
     <string name="addLocation_cb_addLocationToList">Add to location list</string>
     <string name="addLocation_cb_setAlert">Remind me when</string>
     <string name="addLocation_distanceToLocation">Distance to location:</string>
-    <string name="newToDo_location_spinner_prompt">Choose location</string>
-    <string-array name="newToDo_locations_array">
+    <string name="newTask_location_spinner_prompt">Choose location</string>
+    <string-array name="newTask_locations_array">
 		<item>Library</item>   
         <item>University</item>
         <item>Home</item>

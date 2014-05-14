@@ -11,10 +11,10 @@
     android:background="@color/background_grey" >
 
     <EditText 
-        android:id="@+id/newToDo_task_title"
+        android:id="@+id/newTask_task_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/newToDo_task_title" />
+        android:hint="@string/newTask_task_title" />
     
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,18 +23,18 @@
         android:orientation="horizontal">
         
      	<EditText 
-	        android:id="@+id/newToDo_deadlineDate"
+	        android:id="@+id/newTask_deadlineDate"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:hint="@string/newToDo_deadline"
+	        android:hint="@string/newTask_deadline"
 	        android:onClick="showDatePickerDialog"
 	        android:focusableInTouchMode="false" />
 	     
 	     <EditText 
-	        android:id="@+id/newToDo_deadlineTime"
+	        android:id="@+id/newTask_deadlineTime"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:hint="@string/newToDo_deadlineTime"
+	        android:hint="@string/newTask_deadlineTime"
 	        android:onClick="showTimePickerDialog"
 	        android:visibility="gone"
 	        android:focusableInTouchMode="false"/>
@@ -47,14 +47,14 @@
         android:orientation="horizontal">
 	    
         <CheckBox
-	        android:id="@+id/newToDo_checkbox_alertTime"
+	        android:id="@+id/newTask_checkbox_alertTime"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/checkbox_alertTime"
 	        android:visibility="gone" />
 	     
 	     <Spinner
-            android:id="@+id/newToDo_spinner_alertTime"
+            android:id="@+id/newTask_spinner_alertTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:entries="@array/setAlert_deadlineTimes_array"
@@ -63,13 +63,19 @@
              />
 	 </LinearLayout>
 	     
-     <EditText 
-        android:id="@+id/newToDo_location"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/newToDo_location"
-        android:onClick="showMyDialog"
-        android:focusableInTouchMode="false" />
+     <LinearLayout
+         android:id="@+id/locations_linearlayout"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="vertical">
+	     <EditText 
+	        android:id="@+id/newTask_location"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:hint="@string/newTask_location"
+	        android:onClick="showLocationDialog"
+	        android:focusableInTouchMode="false" />
+     </LinearLayout>
      
      <LinearLayout
         android:layout_width="match_parent"
@@ -78,14 +84,14 @@
         android:orientation="horizontal">
 	    
         <CheckBox
-	        android:id="@+id/newToDo_checkbox_alertLocation"
+	        android:id="@+id/newTask_checkbox_alertLocation"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/checkbox_alertLocation"
 	        android:visibility="gone" />
 	     
 	     <Spinner
-            android:id="@+id/newToDo_spinner_alertLocation"
+            android:id="@+id/newTask_spinner_alertLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:entries="@array/setAlert_distances_array"
@@ -95,15 +101,15 @@
 	 </LinearLayout>
 	 
      <EditText 
-        android:id="@+id/newToDo_color"
+        android:id="@+id/newTask_color"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/newToDo_color"
-        android:onClick="showColorSpinnerDialog"
+        android:hint="@string/newTask_color"
+        android:onClick="showColorDialog"
         android:focusableInTouchMode="false" />
      
      <Spinner
-        android:id="@+id/newToDo_color_spinner"
+        android:id="@+id/newTask_color_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" 
         android:entries="@array/setColor_array"
@@ -112,19 +118,19 @@
         android:spinnerMode="dialog"/>
      
      <Spinner
-        android:id="@+id/newToDo_location_spinner"
+        android:id="@+id/newTask_location_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" 
-        android:entries="@array/newToDo_locations_array"
-        android:prompt="@string/newToDo_location_spinner_prompt"
+        android:entries="@array/newTask_locations_array"
+        android:prompt="@string/newTask_location_spinner_prompt"
         android:visibility="gone"
         android:spinnerMode="dialog"/>
      
      <EditText 
-        android:id="@+id/newToDo_notes"
+        android:id="@+id/newTask_notes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/newToDo_notes"
+        android:hint="@string/newTask_notes"
         android:lines="6"
         android:gravity="top|left"
         android:background="#ffffff"/>

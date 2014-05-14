@@ -2,15 +2,14 @@ package de.kamson.data;
 
 import java.util.HashMap;
 
-public class ToDoUtils {
-	public final static String TODO_ID = "id";
-	public final static String TODO_NAME = "name";
-	public final static String TODO_DEADLINE = "deadline";
-	public final static String TODO_TIMETODEADLINE = "timeToDeadline";
-	public final static String TODO_LOCATIONS = "locations";
-	public final static String TODO_RANGE = "range";
-	public final static String TODO_ISACTIVE = "isActive";
-	public final static String TODO_COLOR = "color";
+public class TaskUtils {
+	public final static String TASK_ID = "task_id";
+	public final static String TASK_NAME = "task_name";
+	public final static String TASK_DEADLINE = "deadline";
+	public final static String TASK_DEADLINE_ALERT = "timeToDeadline";
+	public final static String TASK_ISACTIVE = "isActive";
+	public final static String TASK_COLOR = "color";
+	public final static String TASK_NOTES = "notes";
 	
 	public final static int RED = 0xffff0000;
 	public final static int BLUE = 0xff0000ff;

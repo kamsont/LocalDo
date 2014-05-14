@@ -19,4 +19,8 @@ public class Task {
 		this.color = color;
 		this.notes = notes;
 	}
+	
+	public Task() {
+		this.id = -1;
+	}
 }

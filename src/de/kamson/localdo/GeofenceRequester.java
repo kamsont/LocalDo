@@ -165,8 +165,11 @@ public class GeofenceRequester
         // Request current location
         mLocation = mLocationClient.getLastLocation();
         // Send a request to add the current geofences
-        Toast.makeText(mActivity, "Geofences added", Toast.LENGTH_SHORT).show();
-        mLocationClient.addGeofences(mCurrentGeofences, mGeofencePendingIntent, this);
+        Toast.makeText(mActivity, mCurrentGeofences.size()+" Geofences added", Toast.LENGTH_SHORT).show();
+        //
+        if (mCurrentGeofences.size() != 0) {
+        	mLocationClient.addGeofences(mCurrentGeofences, mGeofencePendingIntent, this);
+        }
     }
 
     /*

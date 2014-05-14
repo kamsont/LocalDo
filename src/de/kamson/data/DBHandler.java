@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class DBHandler {
 	
@@ -65,6 +66,33 @@ public class DBHandler {
 		return database.insert(DBHelper.TABLE_TASKS_LOCATIONS, null, values);		
 	}
 	
+	public int updateTasks(long id, String name, long deadline, long deadline_alert, int active, int color, String notes) {
+		ContentValues values = new ContentValues();
+		values.put(DBHelper.TASKS_COLUMN_NAME, name);
+		values.put(DBHelper.TASKS_COLUMN_DEADLINE, deadline);
+		values.put(DBHelper.TASKS_COLUMN_DEADLINE_ALERT, deadline_alert);
+		values.put(DBHelper.TASKS_COLUMN_ACTIVE, active);
+		values.put(DBHelper.TASKS_COLUMN_COLOR, color);
+		values.put(DBHelper.TASKS_COLUMN_NOTES, notes);
+		
+		return database.update(DBHelper.TABLE_TASKS, values, DBHelper.TASKS_COLUMN_ID + " = " + id, null);
+	}
+	
+	public int updateLocations(long id, String name, double latitude, double longitude, int range) {
+		ContentValues values = new ContentValues();
+		values.put(DBHelper.LOCATIONS_COLUMN_NAME, name);
+		values.put(DBHelper.LOCATIONS_COLUMN_LATITUDE, latitude);
+		values.put(DBHelper.LOCATIONS_COLUMN_LONGITUDE, longitude);
+		values.put(DBHelper.LOCATIONS_COLUMN_RANGE, range);
+		
+		return database.update(DBHelper.TABLE_LOCATIONS, values, DBHelper.LOCATIONS_COLUMN_ID + " = " + id, null);
+	}
+	
+	// Not needed
+//	public int updateTaskLocations(long id, String name, double latitude, double longitude, int range) {
+//		
+//	}
+	
 	public List<Task> getAllTasks() {
 		Cursor cursor = database.query(DBHelper.TABLE_TASKS, allTasksColumns, null, null, null, null, null);		
 		List<Task> allTasks = new ArrayList<Task>();
@@ -75,10 +103,7 @@ public class DBHandler {
 			long deadline = cursor.getLong(2);
 			long deadline_alert = cursor.getLong(3);
 			int active = cursor.getInt(4);
-			boolean isActive = false;
-			if (active == 1) {
-				isActive = true;
-			}
+			boolean isActive = (active == 1) ? true : false;
 			int color = cursor.getInt(5);
 			String notes = cursor.getString(6);			
 			allTasks.add(new Task(id, name, deadline, deadline_alert, isActive, color, notes));
@@ -89,19 +114,19 @@ public class DBHandler {
 	
 	public Task getTask(long task_id) {
 		Cursor cursor = database.query(DBHelper.TABLE_TASKS, allTasksColumns, DBHelper.TASKS_COLUMN_ID + " = " + task_id, null, null, null, null);		
-		if (cursor.getCount() > 0){
+		Log.e("DBHandler", "Count ="+cursor.getColumnCount());
+		if (cursor != null){
+			cursor.moveToFirst();
 			long id = cursor.getLong(0);			
 			String name= cursor.getString(1);
 			long deadline = cursor.getLong(2);
 			long deadline_alert = cursor.getLong(3);
 			int active = cursor.getInt(4);
-			boolean isActive = false;
-			if (active == 1) {
-				isActive = true;
-			}
+			boolean isActive = (active == 1) ? true : false;
 			int color = cursor.getInt(5);
 			String notes = cursor.getString(6);			
-			return new Task(id, name, deadline, deadline_alert, isActive, color, notes);			
+			return new Task(id, name, deadline, deadline_alert, isActive, color, notes);
+			
 		}
 		else {
 			return null;

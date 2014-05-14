@@ -75,7 +75,7 @@ public class SetAlertActivity extends Activity {
 	
 	
 	public void openAddNew() {
-		Intent intent = new Intent(getApplicationContext(), AddNewToDoActivity.class);
+		Intent intent = new Intent(getApplicationContext(), AddNewTaskActivity.class);
 		startActivity(intent);
 	}
 	

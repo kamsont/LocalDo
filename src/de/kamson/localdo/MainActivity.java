@@ -14,10 +14,11 @@ import com.google.android.gms.location.LocationStatusCodes;
 import de.kamson.localdo.GeofenceRemover;
 import de.kamson.localdo.GeofenceRequester;
 import de.kamson.localdo.GeofenceUtils.*;
+import de.kamson.data.DBHandler;
 import de.kamson.data.MyLocation;
 import de.kamson.data.TestData;
-import de.kamson.data.ToDo;
-import de.kamson.data.ToDoUtils;
+import de.kamson.data.Task;
+import de.kamson.data.TaskUtils;
 import android.location.Criteria;
 import android.location.Location;
 
@@ -60,6 +61,7 @@ public class MainActivity extends Activity {
     
     // Add geofences handler
     private GeofenceRequester mGeofenceRequester;
+    
     // Remove geofences handler
     private GeofenceRemover mGeofenceRemover;
     
@@ -85,17 +87,20 @@ public class MainActivity extends Activity {
 	/*
 	 * List variables
 	 */
-	ToDoAdapter active_adapter;
-	ToDoAdapter finished_adapter;
-	List<ToDo> toDos = new ArrayList<ToDo>();	
-	List<ToDo> active_toDos = new ArrayList<ToDo>();
-	List<ToDo> finished_toDos = new ArrayList<ToDo>();
+	TaskAdapter active_adapter;
+	TaskAdapter finished_adapter;
+	List<Task> tasks = new ArrayList<Task>();	
+	List<Task> active_tasks = new ArrayList<Task>();
+	List<Task> finished_tasks = new ArrayList<Task>();
 	List<MyLocation> locations = new ArrayList<MyLocation>();
 	
-	static final int TODO_LIST = 1;
-	static final int ACTIVE_TODO_LIST = 2;
-	static final int FINISHED_TODO_LIST = 3;
+	static final int TASKS_LIST = 1;
+	static final int ACTIVE_TASKS_LIST = 2;
+	static final int FINISHED_TASKS_LIST = 3;
 	static final int LOCATION_LIST = 4;
+	
+	// Database variables
+	DBHandler dbHandler;
 	
 	// Global state variable
 	GlobalState gs;
@@ -114,9 +119,9 @@ public class MainActivity extends Activity {
     
     
     // Request Code
-    static final int ADDNEWTODO = 200;
+    static final int ADDNEWTASK = 100;
 	
-	public ToDo chosenToDo;
+	public Task chosenTask;
 	public Animation anim_Move;
 	public TestData testData;
 
@@ -130,18 +135,30 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState); 		
 		setContentView(R.layout.activity_main);		
-		loadData();
-		createGeofences();
-		updateLists();
+		
+		// To follow lifecycle of the activity
+		Toast.makeText(this, "onCreate called", Toast.LENGTH_SHORT).show();
+		
+		// Loads tasks and locations from database
+		loadDataFromDB();
+		
+		// Build a list of geofences build from locations that are bound to an active task
+		createGeofencesList();
+		
+		// Build the listviews for active and finished task lists
+		updateListViews();
+		
 		setListItemClickListener();		
+		
 		//anim_Move = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.move);
+		
 		updateListTitle();
+		
 		/*
 		// Create the LocationRequest object
         mLocationRequest = LocationRequest.create();
         // Use high accuracy
-        mLocationRequest.setPriority(
-                LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         // Set the update interval to 5 seconds
         mLocationRequest.setInterval(UPDATE_INTERVAL);
         // Set the fastest update interval to 1 second
@@ -167,7 +184,6 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_new:
-			Toast.makeText(getApplicationContext(), "Add selected", Toast.LENGTH_LONG).show();
 			openAddNew();
 			return true;
 		/*
@@ -181,31 +197,27 @@ public class MainActivity extends Activity {
 	
 	public void onStart() {
 		super.onStart();
-		
+		Toast.makeText(this, "onStart called", Toast.LENGTH_SHORT).show();
 		//mLocationClient.connect();
 		
 		/*
-         * Record the request as an ADD. If a connection error occurs,
-         * the app can automatically restart the add request if Google Play services
-         * can fix the error
+         * Record the request as an ADD. If a connection error occurs, the app can automatically restart 
+         * the add request if Google Play services can fix the error
          */
 		mRequestType = GeofenceUtils.REQUEST_TYPE.ADD;
 		
 		 /*
-         * Check for Google Play services. Do this after
-         * setting the request type. If connecting to Google Play services
-         * fails, onActivityResult is eventually called, and it needs to
-         * know what type of request was in progress.
+         * Check for Google Play services. Do this after setting the request type. If connecting to Google Play services
+         * fails, onActivityResult is eventually called, and it needs to know what type of request was in progress.
          */
 		if (servicesConnected()) {
 			// Start the request. Fail if there's already a request in progress
 	        try {
-	            // Try to add geofences		        	
+	            // Try to add geofences
 	        	mGeofenceRequester.addGeofences(mCurrentGeofences);
 	        } catch (UnsupportedOperationException e) {
 	            // Notify user that previous request hasn't finished.
-	            Toast.makeText(this, R.string.add_geofences_already_requested_error,
-	                        Toast.LENGTH_LONG).show();
+	            Toast.makeText(this, R.string.add_geofences_already_requested_error, Toast.LENGTH_SHORT).show();
 	        }
 		}
 	}
@@ -213,12 +225,14 @@ public class MainActivity extends Activity {
 	public void onResume() {
 		super.onResume();
 		//locationmanager.requestLocationUpdates(provider, 400, 1, this);
+		Toast.makeText(this, "onResume called", Toast.LENGTH_SHORT).show();
 	}
 	
 	public void onPause() {
 		super.onPause();
 		//locationmanager.removeUpdates(this);
 		// should we do some saving operations here?
+		Toast.makeText(this, "onPause called", Toast.LENGTH_SHORT).show();
 	}
 	
 	public void onStop() {		
@@ -227,7 +241,7 @@ public class MainActivity extends Activity {
          * considered "dead".
          */
         //mLocationClient.disconnect();		
-        
+		Toast.makeText(this, "onStop called", Toast.LENGTH_SHORT).show();
 		super.onStop();
 	}
 	
@@ -282,27 +296,22 @@ public class MainActivity extends Activity {
                         Log.d(GeofenceUtils.APPTAG, getString(R.string.no_resolution));
                 }
                 
-            case ADDNEWTODO: {
+            case ADDNEWTASK: {
             	
             	switch(resultCode) {
             	
             		case RESULT_OK:
             			// get Data from AddNewToDo
             			//intent.getExtras().get()
+            			loadDataFromDB();
+            			updateListViews();
+            			updateListTitle();
             		break;
             		case RESULT_FIRST_USER:
             			// Abuse this result code to delete elements
-            			// Delete in complete task list
-            			long id = intent.getLongExtra(ToDoUtils.TODO_ID, -1);
-            			deleteItemFromList(id, TODO_LIST);            			
-            			// Determine if active or finished task and delete from that list
-            			if (intent.getBooleanExtra(ToDoUtils.TODO_ISACTIVE, false)) {
-            				deleteItemFromList(id, ACTIVE_TODO_LIST);            				
-            			}
-            			else {
-            				deleteItemFromList(id, FINISHED_TODO_LIST);	            				
-            			}
-            			updateLists();            			
+            			loadDataFromDB();
+            			updateListViews();
+            			updateListTitle();
             		break;
             	}
             }
@@ -317,42 +326,40 @@ public class MainActivity extends Activity {
         }
     }
 	
-	private void loadData() {
+	private void loadDataFromDB() {
 		
-		// get Global State Singleton
-		gs = (GlobalState) getApplication();
-		// Instantiate the database (for now no real database - only test data)
-		testData = new TestData();
+		// Get Global State Singleton
+		//gs = (GlobalState) getApplication();
+		// Get the handler for the database 
+		dbHandler = new DBHandler(this);
 		
-		//  get the todos
-		toDos = testData.toDos;			
+		// Instantiate database
+		dbHandler.open();
 		
-		// fill the lists for active and passive tasks
-		for (ToDo tmpToDo: toDos) {			
-			if(tmpToDo.isActive)				   
-			    active_toDos.add(tmpToDo);
+		// Instantiate testdata
+		//testData = new TestData();
+		
+		
+		//  Read all tasks from database 
+		tasks = dbHandler.getAllTasks();			
+		
+		// Fill the lists for active and passive tasks from all tasks list
+		for (Task tmpTask: tasks) {			
+			if(tmpTask.isActive)				   
+			    active_tasks.add(tmpTask);
 			else
-				finished_toDos.add(tmpToDo);
+				finished_tasks.add(tmpTask);
 		}
 		
-		// get the locations
-		locations = testData.locations;	
+		// Get the locations
+		locations = dbHandler.getAllLocations();	
 		
-		// update the global state after all lists have been filled
+		// Update the global state after all lists have been filled
 		//updateGlobalState();
 		
 	}
 	
-	// propagate changes to global state
-	private void updateGlobalState() {
-		gs.setToDoList(toDos);
-		gs.setLocationList(locations);
-		gs.setActiveToDoList(active_toDos);
-		gs.setFinishedToDoList(finished_toDos);
-		gs.setChosenToDo(chosenToDo);
-	}
-	
-	private void createGeofences() {
+	private void createGeofencesList() {
 		// Instantiate a Geofence requester
         mGeofenceRequester = new GeofenceRequester(this);
 
@@ -364,10 +371,12 @@ public class MainActivity extends Activity {
 		
 		// Build Geofence-objects and add them to current list of geofences
 		// for now expiration time is set to endless
-		for(ToDo toDo: active_toDos) {
-			for(MyLocation location: toDo.locations) {
+		List<MyLocation> task_locations;
+		for(Task task: active_tasks) {
+			task_locations = dbHandler.getLocationsToTask(task.id);
+			for(MyLocation location: task_locations) {
 				mCurrentGeofences.add(new Geofence.Builder()
-							.setRequestId(String.valueOf(toDo.name+" - "+location.name))
+							.setRequestId(String.valueOf(task.name+" - "+location.name))
 							.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
 							.setCircularRegion(location.lat, location.lng, location.range)
 							.setExpirationDuration(Geofence.NEVER_EXPIRE)
@@ -378,47 +387,51 @@ public class MainActivity extends Activity {
 		
 	}
 	
-	public void updateLists() {
+	public void updateListViews() {
+		// Get the listviews
 		active_tasks_lv = (ListView)findViewById(R.id.active_tasks_list);
 		finished_tasks_lv = (ListView)findViewById(R.id.finished_tasks_list);
-		active_adapter = new ToDoAdapter(this, R.layout.rowlayout_active, active_toDos);
-		//ArrayAdapter<String> active_adapter = new ArrayAdapter<String>(this, R.layout.rowlayout, R.id.label, test_values1);
-		finished_adapter = new ToDoAdapter(this, R.layout.rowlayout_finished, finished_toDos);
-		//ArrayAdapter<String> finished_adapter = new ArrayAdapter<String>(this, R.layout.rowlayout, R.id.label, test_values2);
+		
+		// Instantiate the adapters for the listviews
+		active_adapter = new TaskAdapter(this, R.layout.rowlayout_active, active_tasks, dbHandler);
+		finished_adapter = new TaskAdapter(this, R.layout.rowlayout_finished, finished_tasks, dbHandler);
+		
+		// Assign the adapters to the corresponding listviews
 		active_tasks_lv.setAdapter(active_adapter);
 		finished_tasks_lv.setAdapter(finished_adapter);
 	} 
 	
 	public void setListItemClickListener() {
+		// For the active tasks list
 		active_tasks_lv.setOnItemClickListener(new OnItemClickListener() {
+			// Call activity to edit chosen active task
 			@Override			
 			public void onItemClick(AdapterView<?> l, View v, int position, long id) {
-				chosenToDo = (ToDo)active_tasks_lv.getItemAtPosition(position);
-				String item = chosenToDo.name;
-				Toast.makeText(getApplicationContext(), item + " selected", Toast.LENGTH_SHORT).show();
+				chosenTask = (Task)active_tasks_lv.getItemAtPosition(position);
 				//v.startAnimation(anim_Move);
-				editToDo();
+				editTask();
 			}
 		});
 		
+		// For the finished tasks list
 		finished_tasks_lv.setOnItemClickListener(new OnItemClickListener() {
+			// Call activity to edit chosen finished task
 			@Override			
 			public void onItemClick(AdapterView<?> l, View v, int position, long id) {
-				chosenToDo = (ToDo)finished_tasks_lv.getItemAtPosition(position);
-				String item = chosenToDo.name;
-				Toast.makeText(getApplicationContext(), item + " selected", Toast.LENGTH_SHORT).show();
-				
-				editToDo();
+				chosenTask = (Task)finished_tasks_lv.getItemAtPosition(position);
+				editTask();
 			}
 		});
 	}
 	
-	public void shiftItem(int pos, String list){
-		if(list == "active"){
-			finished_toDos.add(active_toDos.remove(pos));
+	public void shiftItem(int pos, int list){
+		// Remove task from active list and add to finished list
+		if(list == ACTIVE_TASKS_LIST){
+			finished_tasks.add(active_tasks.remove(pos));
 		}
+		// Remove task from finished list and add to active list
 		else{
-			active_toDos.add(finished_toDos.remove(pos));
+			active_tasks.add(finished_tasks.remove(pos));
 		}
 		updateListTitle();
 		active_adapter.notifyDataSetChanged();
@@ -427,151 +440,43 @@ public class MainActivity extends Activity {
 	
 	public void updateListTitle() {
 		active_listTitle = (TextView)findViewById(R.id.active_tasks_title);
-		active_listTitle.setText(active_toDos.size() + " tasks to do");
+		active_listTitle.setText(active_tasks.size() + " tasks to do");
 		finished_listTitle = (TextView)findViewById(R.id.finished_tasks_title);
-		finished_listTitle.setText(finished_toDos.size() + " tasks finished");
-	}
-	
-	public void deleteItemFromList(long id, int list) {
-		Iterator it;
-		ToDo toDo;
-		MyLocation location;
-		switch (list) {
-			case TODO_LIST:
-				it = toDos.iterator();			
-				while(it.hasNext()) {
-					toDo = (ToDo)it.next();
-					if (toDo.id == id) {
-						it.remove();
-					}
-				}
-				break;
-			case ACTIVE_TODO_LIST:
-				it = active_toDos.iterator();
-				while(it.hasNext()) {
-					toDo = (ToDo)it.next();
-					if (toDo.id == id) {
-						it.remove();
-					}
-				}
-				active_adapter.notifyDataSetChanged();
-				break;
-			case FINISHED_TODO_LIST:
-				it = finished_toDos.iterator();
-				while(it.hasNext()) {
-					toDo = (ToDo)it.next();
-					if (toDo.id == id) {
-						it.remove();
-					}
-				}
-				finished_adapter.notifyDataSetChanged();
-				break;
-			case LOCATION_LIST:
-				it = locations.iterator();
-				while(it.hasNext()) {
-					location = (MyLocation)it.next();
-					if (location.id == id) {
-						it.remove();
-					}
-				}
-				break;
-		}
-		updateGlobalState();		
+		finished_listTitle.setText(finished_tasks.size() + " tasks finished");
 	}
 	
 	
-	public void addItemToList(long id, int list) {
-		Iterator it;
-		ToDo toDo;
-		MyLocation location;
-		switch (list) {
-			case TODO_LIST:
-				toDos.add(chosenToDo);
-				break;
-			case ACTIVE_TODO_LIST:
-				active_toDos.add(chosenToDo);
-				active_adapter.notifyDataSetChanged();
-				break;
-			// This case is never used 
-			case FINISHED_TODO_LIST:
-				finished_toDos.add(chosenToDo);
-				finished_adapter.notifyDataSetChanged();
-				break;
-			case LOCATION_LIST:
-				it = chosenToDo.locations.iterator();
-				while(it.hasNext()) {
-					location = (MyLocation)it.next();
-					locations.add(location);
-				}
-				break;
-		}
-		updateGlobalState();		
-	}
 	
+	// propagate changes to global state
+//		private void updateGlobalState() {
+//			gs.setToDoList(tasks);
+//			gs.setLocationList(locations);
+//			gs.setActiveToDoList(active_tasks);
+//			gs.setFinishedToDoList(finished_tasks);
+//			gs.setChosenToDo(chosenToDo);
+//		}
+		
 	public void openAddNew() {
 		// No data to send, to ensure that no other data exist assign NULL here
-		chosenToDo = null;
+		chosenTask = null;
 		
-		updateGlobalState();
-		Intent intent = new Intent(getApplicationContext(), AddNewToDoActivity.class);		
+		//updateGlobalState();
+		Intent intent = new Intent(getApplicationContext(), AddNewTaskActivity.class);		
 		startActivity(intent);
 	}
 	
-	public void editToDo() {
-		updateGlobalState();
+	public void editTask() {
+		//updateGlobalState();
+		// Get own actual location
 		mLocation = mGeofenceRequester.mLocation;
-		Intent intent = new Intent(getApplicationContext(), AddNewToDoActivity.class);
-		intent.putExtra(ToDoUtils.TODO_ID, chosenToDo.id);
-		intent.putExtra(ToDoUtils.TODO_NAME, chosenToDo.name);
-		intent.putExtra(ToDoUtils.TODO_DEADLINE, chosenToDo.deadline);
-		intent.putExtra(ToDoUtils.TODO_TIMETODEADLINE, chosenToDo.timeToDeadline);
-		intent.putExtra(ToDoUtils.TODO_LOCATIONS, chosenToDo.getLocationNames());
-		//intent.putExtra(ToDoUtils.TODO_RANGE, chosenToDo.range);
-		intent.putExtra(ToDoUtils.TODO_ISACTIVE, chosenToDo.isActive);
-		intent.putExtra(ToDoUtils.TODO_COLOR, chosenToDo.color);
-		startActivityForResult(intent, ADDNEWTODO);
-	}
-/*
-	@Override
-	public void onLocationChanged(Location arg0) {
-		// TODO Auto-generated method stub
-		String msg = "Updated Location: " +
-                Double.toString(mLocation.getLatitude()) + "," +
-                Double.toString(mLocation.getLongitude());
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-	}
-	
-
-	@Override
-	public void onConnectionFailed(ConnectionResult result) {
-		// TODO Auto-generated method stub
 		
+		// Create intent for new activity to edit task
+		Intent intent = new Intent(getApplicationContext(), AddNewTaskActivity.class);
+		
+		// Only send the ID of the chosen task and reload the task in the other activity
+		intent.putExtra(TaskUtils.TASK_ID, chosenTask.id);		
+		startActivityForResult(intent, ADDNEWTASK);
 	}
-
-	@Override
-	public void onConnected(Bundle connectionHint) {
-		// TODO Auto-generated method stub
-		mLocation = mLocationClient.getLastLocation();
-		// Get the PendingIntent for the request
-        mTransitionPendingIntent = getTransitionPendingIntent();
-        // Send a request to add the current geofences
-        mLocationClient.addGeofences(myGeofences, pendingIntent, this);
-
-		if(mLocation == null) {
-			mLocationClient.requestLocationUpdates(mLocationRequest, this);
-		} else {
-			Toast.makeText(this, "Connected! Location: " + mLocation.getLatitude() + ", " + mLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-		}
-	}
-
-	@Override
-	public void onDisconnected() {
-		// TODO Auto-generated method stub
-		Toast.makeText(this, "Disconnected. Please re-connect.",
-                Toast.LENGTH_SHORT).show();
-
-	}
-*/
 
 	 private boolean servicesConnected() {
 
@@ -602,6 +507,49 @@ public class MainActivity extends Activity {
 	            return false;
 	        }
 	    }
+	 
+	 /*
+		@Override
+		public void onLocationChanged(Location arg0) {
+			// TODO Auto-generated method stub
+			String msg = "Updated Location: " +
+	                Double.toString(mLocation.getLatitude()) + "," +
+	                Double.toString(mLocation.getLongitude());
+	        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+		}
+		
+
+		@Override
+		public void onConnectionFailed(ConnectionResult result) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onConnected(Bundle connectionHint) {
+			// TODO Auto-generated method stub
+			mLocation = mLocationClient.getLastLocation();
+			// Get the PendingIntent for the request
+	        mTransitionPendingIntent = getTransitionPendingIntent();
+	        // Send a request to add the current geofences
+	        mLocationClient.addGeofences(myGeofences, pendingIntent, this);
+
+			if(mLocation == null) {
+				mLocationClient.requestLocationUpdates(mLocationRequest, this);
+			} else {
+				Toast.makeText(this, "Connected! Location: " + mLocation.getLatitude() + ", " + mLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+			}
+		}
+
+		@Override
+		public void onDisconnected() {
+			// TODO Auto-generated method stub
+			Toast.makeText(this, "Disconnected. Please re-connect.",
+	                Toast.LENGTH_SHORT).show();
+
+		}
+	*/
+
 	 
 //	 public static class ErrorDialogFragment extends DialogFragment {
 //

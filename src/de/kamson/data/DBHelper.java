@@ -28,8 +28,8 @@ public class DBHelper extends SQLiteOpenHelper {
 	        TASKS_COLUMN_NAME + " String, " +
 	        TASKS_COLUMN_DEADLINE + " integer, " +
 	        TASKS_COLUMN_DEADLINE_ALERT + " integer, " +
-	        TASKS_COLUMN_ACTIVE + " integer" + 
-	        TASKS_COLUMN_COLOR + " integer" + 
+	        TASKS_COLUMN_ACTIVE + " integer, " + 
+	        TASKS_COLUMN_COLOR + " integer, " + 
 	        TASKS_COLUMN_NOTES + " String);";
 	
 	/*
@@ -67,14 +67,16 @@ public class DBHelper extends SQLiteOpenHelper {
 	public DBHelper(Context context){
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
-
+	
+	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(TABLE_TASKS_CREATE);
 		db.execSQL(TABLE_LOCATIONS_CREATE);
 		db.execSQL(TABLE_TASKS_LOCATIONS_CREATE);
 		
 	}
-
+	
+	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		Log.w(DBHelper.class.getName(),
 	            "Upgrading database from version " + oldVersion + " to "
