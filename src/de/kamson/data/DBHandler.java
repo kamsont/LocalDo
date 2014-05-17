@@ -8,7 +8,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 public class DBHandler {
 	
@@ -113,8 +112,7 @@ public class DBHandler {
 	}
 	
 	public Task getTask(long task_id) {
-		Cursor cursor = database.query(DBHelper.TABLE_TASKS, allTasksColumns, DBHelper.TASKS_COLUMN_ID + " = " + task_id, null, null, null, null);		
-		Log.e("DBHandler", "Count ="+cursor.getColumnCount());
+		Cursor cursor = database.query(DBHelper.TABLE_TASKS, allTasksColumns, DBHelper.TASKS_COLUMN_ID + " = " + task_id, null, null, null, null);
 		if (cursor != null){
 			cursor.moveToFirst();
 			long id = cursor.getLong(0);			
@@ -124,9 +122,9 @@ public class DBHandler {
 			int active = cursor.getInt(4);
 			boolean isActive = (active == 1) ? true : false;
 			int color = cursor.getInt(5);
-			String notes = cursor.getString(6);			
-			return new Task(id, name, deadline, deadline_alert, isActive, color, notes);
+			String notes = cursor.getString(6);	
 			
+			return new Task(id, name, deadline, deadline_alert, isActive, color, notes);			
 		}
 		else {
 			return null;
@@ -151,12 +149,14 @@ public class DBHandler {
 	
 	public MyLocation getLocation(long location_id) {
 		Cursor cursor = database.query(DBHelper.TABLE_LOCATIONS, allLocationsColumns, DBHelper.LOCATIONS_COLUMN_ID + " = " + location_id, null, null, null, null);		
-		if (cursor.getCount() > 0){
+		if (cursor != null){
+			cursor.moveToFirst();
 			long id = cursor.getLong(0);			
 			String name= cursor.getString(1);
 			double latitude = cursor.getDouble(2);
 			double longitude = cursor.getDouble(3);
-			int range = cursor.getInt(4);		
+			int range = cursor.getInt(4);
+			
 			return new MyLocation(id, name, latitude, longitude, range);		
 		}
 		else {
@@ -165,19 +165,35 @@ public class DBHandler {
 	}
 	
 	public List<MyLocation> getLocationsToTask(long task_id) {
+		// First get the ID list
 		Cursor cursor = database.query(DBHelper.TABLE_TASKS_LOCATIONS, allTasksLocationsColumns, DBHelper.TASKS_LOCATIONS_COLUMN_TASK_ID + " = "+ task_id, null, null, null, null);		
-		List<MyLocation> locations = new ArrayList<MyLocation>();
+		List<Long> locationIDs = new ArrayList<Long>();
 		cursor.moveToFirst();
 		while(!cursor.isAfterLast()){
-			long id = cursor.getLong(0);			
-			String name= cursor.getString(1);
-			double latitude = cursor.getDouble(2);
-			double longitude = cursor.getDouble(3);
-			int range = cursor.getInt(4);		
-			locations.add(new MyLocation(id, name, latitude, longitude, range));
+			locationIDs.add(cursor.getLong(1));			
 			cursor.moveToNext();
 		}
+		// Get locations by the id list
+		List<MyLocation> locations = new ArrayList<MyLocation>();
+		for (long id:locationIDs) {
+			locations.add(getLocation(id));
+		}
 		return locations;
+	}
+	
+	public List<Task> getTasksToLocation(long location_id) {
+		Cursor cursor = database.query(DBHelper.TABLE_TASKS_LOCATIONS, allTasksLocationsColumns, DBHelper.TASKS_LOCATIONS_COLUMN_LOCATION_ID + " = "+ location_id, null, null, null, null);		
+		List<Long> taskIDs = new ArrayList<Long>();
+		cursor.moveToFirst();
+		while(!cursor.isAfterLast()){
+			taskIDs.add(cursor.getLong(0));
+			cursor.moveToNext();
+		}
+		List<Task> tasks = new ArrayList<Task>();
+		for (long id:taskIDs) {
+			tasks.add(getTask(id));
+		}
+		return tasks;
 	}
 	
 	public void deleteTask(long id){
@@ -187,9 +203,7 @@ public class DBHandler {
 	    database.delete(DBHelper.TABLE_TASKS, DBHelper.TASKS_COLUMN_ID
 	        + " = " + id, null);
 	    
-	    // Delete all entries bound to task from tasks_locations table
-	    database.delete(DBHelper.TABLE_TASKS_LOCATIONS, DBHelper.TASKS_LOCATIONS_COLUMN_TASK_ID
-		        + " = " + id, null);
+	   deleteTaskFromTaskLocations(id);
 	}
 	
 	public void deleteLocation(long id){
@@ -204,6 +218,12 @@ public class DBHandler {
 	    // Delete all entries bound to task from tasks_locations table should never be needed because of precheck
 	    //database.delete(dbHelper.TABLE_TASKS_LOCATIONS, dbHelper.TASKS_COLUMN_ID
 		//        + " = " + id, null);	    
+	}
+	
+	public void deleteTaskFromTaskLocations(long id) {
+		 // Delete all entries bound to task from tasks_locations table
+	    database.delete(DBHelper.TABLE_TASKS_LOCATIONS, DBHelper.TASKS_LOCATIONS_COLUMN_TASK_ID
+		        + " = " + id, null);
 	}
 	
 	public void clearTasks(){

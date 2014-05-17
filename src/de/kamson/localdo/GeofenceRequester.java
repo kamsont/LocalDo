@@ -11,7 +11,6 @@ import com.google.android.gms.location.LocationClient.OnAddGeofencesResultListen
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.location.Location;
@@ -53,9 +52,7 @@ public class GeofenceRequester
     // Stores the current instantiation of the location client
     private LocationClient mLocationClient;
     
-    // Store the current location of phone
-    Location mLocation;
-
+    
     /*
      * Flag that indicates whether an add or remove request is underway. Check this
      * flag before attempting to start a new request.
@@ -163,12 +160,24 @@ public class GeofenceRequester
         mGeofencePendingIntent = createRequestPendingIntent();
         
         // Request current location
-        mLocation = mLocationClient.getLastLocation();
+        getLocation();
+        
         // Send a request to add the current geofences
-        Toast.makeText(mActivity, mCurrentGeofences.size()+" Geofences added", Toast.LENGTH_SHORT).show();
-        //
         if (mCurrentGeofences.size() != 0) {
         	mLocationClient.addGeofences(mCurrentGeofences, mGeofencePendingIntent, this);
+        	
+            Toast.makeText(mActivity, mCurrentGeofences.size()+" Geofences added", Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    public void getLocation() {
+    	 // Request current location
+        if (mLocationClient.isConnected()) {
+	    	MainActivity.mLocation = mLocationClient.getLastLocation();
+	        Toast.makeText(mActivity, "Location found", Toast.LENGTH_SHORT).show();
+        }
+        else {
+        	Toast.makeText(mActivity, "No Location found", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -23,4 +23,11 @@ public class Task {
 	public Task() {
 		this.id = -1;
 	}
+	
+	public boolean equals(Task task) {
+		if (this.id == task.id)
+			return true;
+		else
+			return false;
+	}
 }

@@ -16,4 +16,15 @@ public class MyLocation {
 		this.lng = lng;
 		this.range = range;
 	}
+	
+	public MyLocation() {
+		this.id = -1;
+	}
+	
+	public boolean equals(MyLocation location) {
+		if (this.id == location.id)
+			return true;
+		else
+			return false;
+	}
 }

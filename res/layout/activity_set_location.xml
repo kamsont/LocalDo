@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".AddLocationActivity"
+    tools:context=".SetLocationActivity"
     android:orientation="vertical"
     android:background="@color/background_grey" >
   
@@ -24,10 +24,10 @@
 	
 	
     <CheckBox 
-        android:id="@+id/addLocation_cb_addLocationToList"
+        android:id="@+id/setLocation_cb_addLocationToList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/addLocation_cb_addLocationToList" 
+        android:text="@string/setLocation_cb_addLocationToList" 
         android:checked="true" />     
 	
 	
@@ -40,28 +40,28 @@
 	  android:layout_weight="1" />
 	
 	<CheckBox 
-        android:id="@+id/addLocation_cb_setAlert"
+        android:id="@+id/setLocation_cb_setAlert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/addLocation_cb_setAlert"/>
+        android:text="@string/setLocation_cb_setAlert"/>
 	
 	<LinearLayout
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:orientation="horizontal">
 		<TextView 
-		    android:id="@+id/addLocation_distanceToLocation"
+		    android:id="@+id/setLocation_distanceToLocation"
 		    android:layout_width="0dp"
 		    android:layout_height="wrap_content"
-		    android:text="@string/addLocation_distanceToLocation"
+		    android:text="@string/setLocation_distanceToLocation"
 		    android:layout_weight="1"/>
 		<Spinner
-            android:id="@+id/addLocation_spinner_distance"
+            android:id="@+id/setLocation_spinner_distances"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:entries="@array/setAlert_distances_array"
-            android:prompt="@string/setAlert_distance_spinner_prompt"  
+            android:prompt="@string/setAlert_distances_spinner_prompt"  
              />
 	</LinearLayout>
 	

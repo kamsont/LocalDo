@@ -31,8 +31,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="de.kamson.localdo.AddNewTaskActivity"
-            android:label="@string/title_activity_add_new_to_do"
+            android:name="de.kamson.localdo.SetTaskActivity"
+            android:label="@string/title_activity_set_task"
             android:parentActivityName="de.kamson.localdo.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -41,10 +41,10 @@
         <activity
             android:name="de.kamson.localdo.SetAlertActivity"
             android:label="@string/title_activity_set_alert"
-            android:parentActivityName="de.kamson.localdo.AddNewToDoActivity" >
+            android:parentActivityName="de.kamson.localdo.SetTaskActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.kamson.localdo.AddNewTaskActivity" />
+                android:value="de.kamson.localdo.SetTaskActivity" />
         </activity>
         <service
 		    android:name="de.kamson.localdo.ReceiveTransitionsIntentService"
@@ -52,12 +52,12 @@
 		    android:exported="false">
 		</service>
         <activity
-            android:name="de.kamson.localdo.AddLocationActivity"
+            android:name="de.kamson.localdo.SetLocationActivity"
             android:label="@string/title_activity_set_location"
-            android:parentActivityName="de.kamson.localdo.AddNewTaskActivity" >
+            android:parentActivityName="de.kamson.localdo.SetTaskActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.kamson.localdo.AddNewTaskActivity" />
+                android:value="de.kamson.localdo.SetTaskActivity" />
         </activity>
          <meta-data 
             android:name="com.google.android.maps.v2.API_KEY"

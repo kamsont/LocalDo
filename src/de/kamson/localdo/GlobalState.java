@@ -1,6 +1,5 @@
 package de.kamson.localdo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.kamson.data.MyLocation;
@@ -17,8 +16,7 @@ public class GlobalState extends Application{
 	private List<ToDo> active_toDos;
 	private List<ToDo> finished_toDos;
 	private ToDo chosenToDo;
-	private MyLocation newLocation;
-	private MyLocation actualLocation;
+	private MyLocation newLocation;	
 	
 	
 	public ToDo getToDoFromList(long id) {

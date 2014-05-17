@@ -15,10 +15,11 @@ import de.kamson.localdo.GeofenceRemover;
 import de.kamson.localdo.GeofenceRequester;
 import de.kamson.localdo.GeofenceUtils.*;
 import de.kamson.data.DBHandler;
+import de.kamson.data.MyConstants;
 import de.kamson.data.MyLocation;
 import de.kamson.data.TestData;
 import de.kamson.data.Task;
-import de.kamson.data.TaskUtils;
+import de.kamson.data.MyConstants;
 import android.location.Criteria;
 import android.location.Location;
 
@@ -68,6 +69,7 @@ public class MainActivity extends Activity {
     /*
      * Location variables
      */
+    // Position is requested in GeoRequester
 	public static Location mLocation;
 	LocationClient mLocationClient;
 	LocationRequest mLocationRequest;
@@ -89,10 +91,10 @@ public class MainActivity extends Activity {
 	 */
 	TaskAdapter active_adapter;
 	TaskAdapter finished_adapter;
-	List<Task> tasks = new ArrayList<Task>();	
-	List<Task> active_tasks = new ArrayList<Task>();
-	List<Task> finished_tasks = new ArrayList<Task>();
-	List<MyLocation> locations = new ArrayList<MyLocation>();
+	List<Task> tasks;	
+	List<Task> active_tasks;
+	List<Task> finished_tasks;
+	List<MyLocation> locations;
 	
 	static final int TASKS_LIST = 1;
 	static final int ACTIVE_TASKS_LIST = 2;
@@ -115,11 +117,8 @@ public class MainActivity extends Activity {
     private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
     // A fast frequency ceiling in milliseconds
     private static final long FASTEST_INTERVAL =
-            MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
-    
-    
-    // Request Code
-    static final int ADDNEWTASK = 100;
+            MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;   
+   
 	
 	public Task chosenTask;
 	public Animation anim_Move;
@@ -137,7 +136,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);		
 		
 		// To follow lifecycle of the activity
-		Toast.makeText(this, "onCreate called", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(this, "Main onCreate called", Toast.LENGTH_SHORT).show();
 		
 		// Loads tasks and locations from database
 		loadDataFromDB();
@@ -184,7 +183,7 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_new:
-			openAddNew();
+			addNewTask();
 			return true;
 		/*
 		case R.id.action_settings:
@@ -197,7 +196,7 @@ public class MainActivity extends Activity {
 	
 	public void onStart() {
 		super.onStart();
-		Toast.makeText(this, "onStart called", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(this, "Main onStart called", Toast.LENGTH_SHORT).show();
 		//mLocationClient.connect();
 		
 		/*
@@ -225,14 +224,17 @@ public class MainActivity extends Activity {
 	public void onResume() {
 		super.onResume();
 		//locationmanager.requestLocationUpdates(provider, 400, 1, this);
-		Toast.makeText(this, "onResume called", Toast.LENGTH_SHORT).show();
+		if (mGeofenceRequester != null) {
+			mGeofenceRequester.getLocation();
+		}
+		//Toast.makeText(this, "Main onResume called", Toast.LENGTH_SHORT).show();
 	}
 	
 	public void onPause() {
 		super.onPause();
 		//locationmanager.removeUpdates(this);
 		// should we do some saving operations here?
-		Toast.makeText(this, "onPause called", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(this, "Main onPause called", Toast.LENGTH_SHORT).show();
 	}
 	
 	public void onStop() {		
@@ -241,7 +243,7 @@ public class MainActivity extends Activity {
          * considered "dead".
          */
         //mLocationClient.disconnect();		
-		Toast.makeText(this, "onStop called", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(this, "Main onStop called", Toast.LENGTH_SHORT).show();
 		super.onStop();
 	}
 	
@@ -296,7 +298,7 @@ public class MainActivity extends Activity {
                         Log.d(GeofenceUtils.APPTAG, getString(R.string.no_resolution));
                 }
                 
-            case ADDNEWTASK: {
+            case MyConstants.REQUESTCODE_SETTASK: {
             	
             	switch(resultCode) {
             	
@@ -343,7 +345,15 @@ public class MainActivity extends Activity {
 		//  Read all tasks from database 
 		tasks = dbHandler.getAllTasks();			
 		
+		// No task found
+		if (tasks == null) {
+			tasks = new ArrayList<Task>();
+		}
 		// Fill the lists for active and passive tasks from all tasks list
+		
+		// Reset the lists
+		active_tasks = new ArrayList<Task>();
+		finished_tasks = new ArrayList<Task>();
 		for (Task tmpTask: tasks) {			
 			if(tmpTask.isActive)				   
 			    active_tasks.add(tmpTask);
@@ -354,8 +364,11 @@ public class MainActivity extends Activity {
 		// Get the locations
 		locations = dbHandler.getAllLocations();	
 		
-		// Update the global state after all lists have been filled
-		//updateGlobalState();
+		// No locations found
+		if (locations == null) {
+			locations = new ArrayList<MyLocation>();
+		}
+		
 		
 	}
 	
@@ -456,26 +469,26 @@ public class MainActivity extends Activity {
 //			gs.setChosenToDo(chosenToDo);
 //		}
 		
-	public void openAddNew() {
+	public void addNewTask() {
 		// No data to send, to ensure that no other data exist assign NULL here
-		chosenTask = null;
+		chosenTask = null;		
 		
-		//updateGlobalState();
-		Intent intent = new Intent(getApplicationContext(), AddNewTaskActivity.class);		
-		startActivity(intent);
+		Intent intent = new Intent(getApplicationContext(), SetTaskActivity.class);
+		intent.putExtra(MyConstants.OPERATING_MODE, MyConstants.MODE_ADD);
+		startActivityForResult(intent, MyConstants.REQUESTCODE_SETTASK);
 	}
 	
 	public void editTask() {
-		//updateGlobalState();
-		// Get own actual location
-		mLocation = mGeofenceRequester.mLocation;
 		
 		// Create intent for new activity to edit task
-		Intent intent = new Intent(getApplicationContext(), AddNewTaskActivity.class);
+		Intent intent = new Intent(getApplicationContext(), SetTaskActivity.class);
+		
+		// Set operating mode for SetTaskActivity 
+		intent.putExtra(MyConstants.OPERATING_MODE, MyConstants.MODE_EDIT);
 		
 		// Only send the ID of the chosen task and reload the task in the other activity
-		intent.putExtra(TaskUtils.TASK_ID, chosenTask.id);		
-		startActivityForResult(intent, ADDNEWTASK);
+		intent.putExtra(MyConstants.TASK_ID, chosenTask.id);		
+		startActivityForResult(intent, MyConstants.REQUESTCODE_SETTASK);
 	}
 
 	 private boolean servicesConnected() {

@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:entries="@array/setAlert_distances_array"
-            android:prompt="@string/setAlert_distance_spinner_prompt" />
+            android:prompt="@string/setAlert_distances_spinner_prompt" />
 
         <CheckBox
             android:id="@+id/setAlert_deadline_checkbox"
@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:entries="@array/setAlert_deadlineTimes_array"
-            android:prompt="@string/setAlert_deadlineTime_spinner_prompt" />
+            android:prompt="@string/setAlert_deadlineTimes_spinner_prompt" />
     </GridLayout>
     
     <TextView
@@ -126,14 +126,14 @@
         android:id="@+id/setAlert_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="hh:mm"
+        android:hint="hh:mm"        
         android:onClick="showTimePickerDialog"/>
     
     <EditText 
         android:id="@+id/setAlert_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="dd:mm:yyyy"
+        android:hint="dd:mm:yyyy"
         android:onClick="showDatePickerDialog"/>
    
 </LinearLayout>
