@@ -369,6 +369,17 @@ public class MainActivity extends Activity {
 			locations = new ArrayList<MyLocation>();
 		}
 		
+		List<String> taskloc = dbHandler.getAllTasksLocations();
+		for(Task t:tasks) {
+			Log.d("DB Tasks", ""+t.id+" "+t.name+" "+t.deadline+" "+t.deadline_alert+" "+t.isActive+" "+t.color+" "+t.notes);
+		}
+		for(MyLocation l:locations) {
+			Log.d("DB Locations", ""+l.id+" "+l.name+" "+l.lat+" "+l.lng+" "+l.range+" "+l.isAnonymous);			
+		}
+		for(String s:taskloc) {
+			Log.d("DB TtoL", s);
+		}
+			
 		
 	}
 	
@@ -388,13 +399,16 @@ public class MainActivity extends Activity {
 		for(Task task: active_tasks) {
 			task_locations = dbHandler.getLocationsToTask(task.id);
 			for(MyLocation location: task_locations) {
-				mCurrentGeofences.add(new Geofence.Builder()
-							.setRequestId(String.valueOf(task.name+" - "+location.name))
-							.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-							.setCircularRegion(location.lat, location.lng, location.range)
-							.setExpirationDuration(Geofence.NEVER_EXPIRE)
-							.build()
-							);
+				// Radius of 0.0 not allowed so we have to sort out location without range 0
+				if (location.range != 0) {
+					mCurrentGeofences.add(new Geofence.Builder()
+								.setRequestId(String.valueOf(task.name+" - "+location.name))
+								.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+								.setCircularRegion(location.lat, location.lng, location.range)
+								.setExpirationDuration(Geofence.NEVER_EXPIRE)
+								.build()
+								);
+				}
 			}
 		}
 		
@@ -406,8 +420,8 @@ public class MainActivity extends Activity {
 		finished_tasks_lv = (ListView)findViewById(R.id.finished_tasks_list);
 		
 		// Instantiate the adapters for the listviews
-		active_adapter = new TaskAdapter(this, R.layout.rowlayout_active, active_tasks, dbHandler);
-		finished_adapter = new TaskAdapter(this, R.layout.rowlayout_finished, finished_tasks, dbHandler);
+		active_adapter = new TaskAdapter(this, R.layout.rowlayout_active, active_tasks, dbHandler, mGeofenceRequester);
+		finished_adapter = new TaskAdapter(this, R.layout.rowlayout_finished, finished_tasks, dbHandler, mGeofenceRequester);
 		
 		// Assign the adapters to the corresponding listviews
 		active_tasks_lv.setAdapter(active_adapter);
@@ -520,6 +534,13 @@ public class MainActivity extends Activity {
 	            return false;
 	        }
 	    }
+	 
+	 public void clearTables(View v) {
+		 //dbHandler.clearTasks();
+		// dbHandler.clearLocations();
+		 dbHandler.clearTasks_Locations();
+		 Toast.makeText(getApplicationContext(), "Table cleared", Toast.LENGTH_SHORT).show();
+	 }
 	 
 	 /*
 		@Override

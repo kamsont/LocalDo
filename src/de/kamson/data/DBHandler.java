@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class DBHandler {
 	
@@ -18,7 +19,7 @@ public class DBHandler {
 			DBHelper.TASKS_COLUMN_ACTIVE, DBHelper.TASKS_COLUMN_COLOR, DBHelper.TASKS_COLUMN_NOTES};
 	private String[] allLocationsColumns = { DBHelper.LOCATIONS_COLUMN_ID, 
 			DBHelper.LOCATIONS_COLUMN_NAME, DBHelper.LOCATIONS_COLUMN_LATITUDE, 
-			DBHelper.LOCATIONS_COLUMN_LONGITUDE, DBHelper.LOCATIONS_COLUMN_RANGE};
+			DBHelper.LOCATIONS_COLUMN_LONGITUDE, DBHelper.LOCATIONS_COLUMN_RANGE, DBHelper.LOCATIONS_COLUMN_ANONYMOUS};
 	private String[] allTasksLocationsColumns = { DBHelper.TASKS_LOCATIONS_COLUMN_ID, 
 			DBHelper.TASKS_LOCATIONS_COLUMN_TASK_ID, DBHelper.TASKS_LOCATIONS_COLUMN_LOCATION_ID};
 	
@@ -46,12 +47,13 @@ public class DBHandler {
 		return database.insert(DBHelper.TABLE_TASKS, null, values);		
 	}
 	
-	public long createLocation(String name, double latitude, double longitude, int range) {
+	public long createLocation(String name, double latitude, double longitude, int range, int anonymous) {
 		ContentValues values = new ContentValues();				
 		values.put(DBHelper.LOCATIONS_COLUMN_NAME, name);	
 		values.put(DBHelper.LOCATIONS_COLUMN_LATITUDE, latitude);
 		values.put(DBHelper.LOCATIONS_COLUMN_LONGITUDE, longitude);
 		values.put(DBHelper.LOCATIONS_COLUMN_RANGE, range);
+		values.put(DBHelper.LOCATIONS_COLUMN_ANONYMOUS, anonymous);
 				
 		return database.insert(DBHelper.TABLE_LOCATIONS, null, values);
 		
@@ -77,12 +79,13 @@ public class DBHandler {
 		return database.update(DBHelper.TABLE_TASKS, values, DBHelper.TASKS_COLUMN_ID + " = " + id, null);
 	}
 	
-	public int updateLocations(long id, String name, double latitude, double longitude, int range) {
+	public int updateLocations(long id, String name, double latitude, double longitude, int range, int anonymous) {
 		ContentValues values = new ContentValues();
 		values.put(DBHelper.LOCATIONS_COLUMN_NAME, name);
 		values.put(DBHelper.LOCATIONS_COLUMN_LATITUDE, latitude);
 		values.put(DBHelper.LOCATIONS_COLUMN_LONGITUDE, longitude);
 		values.put(DBHelper.LOCATIONS_COLUMN_RANGE, range);
+		values.put(DBHelper.LOCATIONS_COLUMN_ANONYMOUS, anonymous);
 		
 		return database.update(DBHelper.TABLE_LOCATIONS, values, DBHelper.LOCATIONS_COLUMN_ID + " = " + id, null);
 	}
@@ -111,7 +114,12 @@ public class DBHandler {
 		return allTasks;
 	}
 	
-	public Task getTask(long task_id) {
+	// Not needed
+	//	public int updateTaskLocations(long id, String name, double latitude, double longitude, int range) {
+	//		
+	//	}
+		
+		public Task getTask(long task_id) {
 		Cursor cursor = database.query(DBHelper.TABLE_TASKS, allTasksColumns, DBHelper.TASKS_COLUMN_ID + " = " + task_id, null, null, null, null);
 		if (cursor != null){
 			cursor.moveToFirst();
@@ -140,8 +148,10 @@ public class DBHandler {
 			String name= cursor.getString(1);
 			double latitude = cursor.getDouble(2);
 			double longitude = cursor.getDouble(3);
-			int range = cursor.getInt(4);		
-			allLocations.add(new MyLocation(id, name, latitude, longitude, range));
+			int range = cursor.getInt(4);
+			int anonymous = cursor.getInt(5);
+			boolean isAnonymous = (anonymous == 1) ? true : false;
+			allLocations.add(new MyLocation(id, name, latitude, longitude, range, isAnonymous));
 			cursor.moveToNext();
 		}
 		return allLocations;
@@ -156,8 +166,9 @@ public class DBHandler {
 			double latitude = cursor.getDouble(2);
 			double longitude = cursor.getDouble(3);
 			int range = cursor.getInt(4);
-			
-			return new MyLocation(id, name, latitude, longitude, range);		
+			int anonymous = cursor.getInt(5);
+			boolean isAnonymous = (anonymous == 1) ? true : false;
+			return new MyLocation(id, name, latitude, longitude, range, isAnonymous);		
 		}
 		else {
 			return null;
@@ -170,7 +181,7 @@ public class DBHandler {
 		List<Long> locationIDs = new ArrayList<Long>();
 		cursor.moveToFirst();
 		while(!cursor.isAfterLast()){
-			locationIDs.add(cursor.getLong(1));			
+			locationIDs.add(cursor.getLong(2));			
 			cursor.moveToNext();
 		}
 		// Get locations by the id list
@@ -186,14 +197,25 @@ public class DBHandler {
 		List<Long> taskIDs = new ArrayList<Long>();
 		cursor.moveToFirst();
 		while(!cursor.isAfterLast()){
-			taskIDs.add(cursor.getLong(0));
+			taskIDs.add(cursor.getLong(1));
 			cursor.moveToNext();
-		}
+		}		
 		List<Task> tasks = new ArrayList<Task>();
 		for (long id:taskIDs) {
 			tasks.add(getTask(id));
 		}
 		return tasks;
+	}
+	
+	public List<String> getAllTasksLocations() {
+		Cursor cursor = database.query(DBHelper.TABLE_TASKS_LOCATIONS, allTasksLocationsColumns, null, null, null, null, null);		
+		List<String> allTasks = new ArrayList<String>();
+		cursor.moveToFirst();
+		while(!cursor.isAfterLast()){				
+			allTasks.add("TaskID:"+cursor.getLong(1)+"-"+"LocationID:"+cursor.getLong(2));
+			cursor.moveToNext();
+		}
+		return allTasks;
 	}
 	
 	public void deleteTask(long id){

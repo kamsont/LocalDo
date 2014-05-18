@@ -8,6 +8,8 @@ import de.kamson.data.MyLocation;
 import de.kamson.data.Task;
 
 import android.content.Context;
+import android.location.Location;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,14 +28,17 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 	int resource;
 	List<Task> objects;
 	DBHandler dbHandler;
+	GeofenceRequester gfr;
 	
-	public TaskAdapter(Context context, int resource, List<Task> objects, DBHandler dbHandler) {
+	
+	public TaskAdapter(Context context, int resource, List<Task> objects, DBHandler dbHandler, GeofenceRequester gfr) {
 		super(context, resource, objects);
 		
 		this.context = context;
 		this.resource = resource;
 		this.objects = (ArrayList<Task>)objects;
-		this.dbHandler = dbHandler;
+		this.dbHandler = dbHandler;	
+		this.gfr = gfr;
 	}
 	
 	public View getView(final int position, View convertView, ViewGroup parent) {
@@ -55,7 +60,20 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 		
 		// Get the locations bound to this task
 		List<MyLocation> task_locations = dbHandler.getLocationsToTask(task.id);
-				
+		// Distances from my position
+		List<Float> distances = new ArrayList<Float>();
+		Location location;
+		if (MainActivity.mLocation != null) {
+			for(MyLocation mLoc:task_locations) {
+				location = new Location("");
+				location.setLatitude(mLoc.lat);
+				location.setLongitude(mLoc.lng);
+				distances.add(location.distanceTo(MainActivity.mLocation));
+			}
+		}
+		else
+			Log.d("Own Position", "NOT FOUND");
+			gfr.getLocation();
 		// Set Title
 		title.setText(task.name);
 		
@@ -65,14 +83,30 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 		if (nameCount == 0) {
 			infos.setText("no location bound to task");
 		}
-		// Exactly one location exist
-		else if (nameCount == 1) {
-			infos.setText(task_locations.get(0).name);
-		}
-		// More than one location exist; display the name of the first one and a hint for the rest
 		else {
-			infos.setText(task_locations.get(0).name+" and other locations");
+			int i = 0;
+			String text = "";
+			for (MyLocation mLoc:task_locations) {
+				text += mLoc.name;
+				if (distances.size() != 0) {
+					text += " ("+distances.get(i)+"m away)";
+				}
+				if (i<task_locations.size()-1) {
+					text += "; ";
+				}
+				i++;
+				
+			}
+			infos.setText(text);
 		}
+//		// Exactly one location exist
+//		else if (nameCount == 1) {
+//			infos.setText(task_locations.get(0).name);
+//		}
+//		// More than one location exist; display the name of the first one and a hint for the rest
+//		else {
+//			infos.setText(task_locations.get(0).name+" and other locations");
+//		}
 				
 		// Set the color of the bar to the right of each list item
 		colorBar.setBackgroundColor(task.color); 

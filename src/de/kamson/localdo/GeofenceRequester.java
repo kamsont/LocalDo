@@ -174,10 +174,10 @@ public class GeofenceRequester
     	 // Request current location
         if (mLocationClient.isConnected()) {
 	    	MainActivity.mLocation = mLocationClient.getLastLocation();
-	        Toast.makeText(mActivity, "Location found", Toast.LENGTH_SHORT).show();
+	        Toast.makeText(mActivity, "Own position found", Toast.LENGTH_SHORT).show();
         }
         else {
-        	Toast.makeText(mActivity, "No Location found", Toast.LENGTH_SHORT).show();
+        	//Toast.makeText(mActivity, "Could not find own position", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -33,9 +33,11 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -95,7 +97,7 @@ public class SetTaskActivity extends Activity {
 		et_taskName = (EditText)findViewById(R.id.setTask_task_name);		
 		et_deadlineDate = (EditText)findViewById(R.id.setTask_deadlineDate); //onClickListener ist in xml
 		et_deadlineTime = (EditText)findViewById(R.id.setTask_deadlineTime); //onClickListener ist in xml
-		ll_locations = (LinearLayout)findViewById(R.id.locations_linearlayout);
+		ll_locations = (LinearLayout)findViewById(R.id.locations_layout);
 		//et_locations = new ArrayList<EditText>();
 		//et_locations.add((EditText)findViewById(R.id.setTask_location));
 		et_color = (EditText)findViewById(R.id.setTask_color); //onClickListener ist in xml
@@ -207,7 +209,7 @@ public class SetTaskActivity extends Activity {
 				
 				// Store the changed locations list for this task
 				for (MyLocation loc: task_locations) {
-					dbHandler.createTaskLocation(task.id, loc.id);
+					dbHandler.createTaskLocation(id, loc.id);
 					Toast.makeText(getApplicationContext(), "Task-Location created", Toast.LENGTH_SHORT).show();
 				}
 				
@@ -233,14 +235,14 @@ public class SetTaskActivity extends Activity {
 	public  void openSetLocation(View v) {
 		tag = (Integer)v.getTag();
 //		String tmp = et_clickedLocation.getHint().toString();
-		Toast.makeText(getApplicationContext(), tag+" clicked", Toast.LENGTH_SHORT).show();
 		showLocationDialog(v);
 	}
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if(requestCode == MyConstants.REQUESTCODE_SETLOCATION) {
-			if(resultCode == RESULT_OK) {				
+			switch (resultCode) {
+			case RESULT_OK:
 				
 				long id = data.getLongExtra(MyConstants.LOCATION_ID, -1);
 				// Not needed
@@ -249,6 +251,10 @@ public class SetTaskActivity extends Activity {
 				updateLocationLists(id);
 				
 				buildLocationViews();
+				break;
+			case RESULT_CANCELED:
+				all_locations = dbHandler.getAllLocations();
+				break;
 			}
 		}
 	}
@@ -278,6 +284,7 @@ public class SetTaskActivity extends Activity {
 			
 			// To add a new task instantiate a new task-object with id=-1
 			task = new Task();
+			task_locations = new ArrayList<MyLocation>();
 			
 		}
 		
@@ -291,12 +298,12 @@ public class SetTaskActivity extends Activity {
 		// In any case we will need all locations to display as choice list
 		all_locations = dbHandler.getAllLocations();
 		
-		String tmp = "TaskID: "+task.id+" -> ";
-		for(MyLocation loc:all_locations) {			
-			tmp += loc.id+"-"+loc.name+"-"+loc.lat+"-"+loc.lng+"-"+loc.range+":+:"; 
-		}
-		et_notes = (EditText)findViewById(R.id.setTask_notes);
-		et_notes.setText(tmp);
+//		String tmp = "TaskID: "+task.id+" -> ";
+//		for(MyLocation loc:all_locations) {			
+//			tmp += loc.id+"-"+loc.name+"-"+loc.lat+"-"+loc.lng+"-"+loc.range+":+:"; 
+//		}
+//		et_notes = (EditText)findViewById(R.id.setTask_notes);
+//		et_notes.setText(tmp);
 	}
 	
 	
@@ -318,24 +325,25 @@ public class SetTaskActivity extends Activity {
 	public static class LocationDialogFragment extends DialogFragment {		
 		public Dialog onCreateDialog(Bundle savedInstanceState) { 
 			// Setup the choice list consisting of all locations
-			String[] choices;
-			
+			List<String> tmp = new ArrayList<String>();
+			// In any case assign the possibility to add a new location as first choice
+			tmp.add("New Location");
 			// No location exist
-			if (all_locations.size() == 0) {
-				choices = new String[1];				
-			}
-			
-			// Locations exist, set choice list size to all_locations+1 because of New location
-			else {
-				choices = new String[all_locations.size()+1];
-				int i = 1;
+			if (all_locations.size() != 0) {
 				for (MyLocation location:all_locations) {
-					choices[i] = location.name;
-					i++;
+					// No anonymous locations 
+					if (!location.isAnonymous) {
+						// Sort out the locations that are already bound to this task
+						
+						Log.d("EVALUATE CONTAINING", location.name);
+						if (!(task_locations.contains(location))) {
+							Log.d("TASKLOCATIONS CONTAINS NO", location.name);
+							tmp.add(location.name);							
+						}
+					}
 				}
 			}
-			// In any case assign the possibility to add a new location as first choice
-			choices[0] = "New Location";
+			String[] choices = tmp.toArray(new String[tmp.size()]);
 			
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -450,6 +458,7 @@ public class SetTaskActivity extends Activity {
 	private static void activateDeadlineAlert() {
 		cb_alertTime.setVisibility(View.VISIBLE);// checkbox alert anzeigen
 		spinner_alertTime.setVisibility(View.VISIBLE);// spinner alert time anzeigen
+		spinner_alertTime.setSelection(MyConstants.DEADLINETIMES.indexOf(task.deadline_alert));
 		spinner_alertTime.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
@@ -458,7 +467,8 @@ public class SetTaskActivity extends Activity {
 				// TODO Auto-generated method stub
 				//Toast.makeText(mContext, arg0.getItemAtPosition(arg2) + "selected", Toast.LENGTH_SHORT).show();
 				// For now set fix to 1h
-				task.deadline_alert = 3600000;
+				String[] tmp = mContext.getResources().getStringArray(R.array.setAlert_deadlineTimes_array);
+				task.deadline_alert = MyConstants.STRING_TO_DEADLINETIME.get(tmp[arg2]);
 			}
 
 			@Override
@@ -473,17 +483,24 @@ public class SetTaskActivity extends Activity {
 		
 		// Get rid of old views and rebuild
 		ll_locations.removeAllViews();
+		
 		int locationsCount = 0;
 		// Check number of locations and display them
 		// What if task_locations.size() == 0? -> null?
 		if (task_locations != null) {
 			locationsCount = task_locations.size();
-			// No location bound to the task			
+			// One column for the EditText and one for the button
+					
 				// Add one EditText for one location plus one last for "Add Location"
 				for (int i = 0; i<locationsCount+1; i++) {
-					
+					LinearLayout ll_tmp = new LinearLayout(mContext);
+					ll_tmp.setOrientation(LinearLayout.HORIZONTAL);
 					// Instantiate new EditText
 					EditText et_tmp = new EditText(mContext);
+					
+					et_tmp.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1));
+					
+					et_tmp.setBackgroundColor(0x00000000);
 					
 					// Set color
 					et_tmp.setTextColor(0xff000000);
@@ -513,7 +530,26 @@ public class SetTaskActivity extends Activity {
 					});
 					
 					// Add Editview to the ViewGroup holding bound location names						
-					ll_locations.addView(et_tmp);
+					ll_tmp.addView(et_tmp);
+					if (i != locationsCount) {
+						Button btn_tmp = new Button(mContext);
+						btn_tmp.setTag(i);
+						btn_tmp.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
+						//btn_tmp.setWidth((int)(gl_locations.getWidth()*0.2));
+						btn_tmp.setBackgroundResource(R.drawable.ic_action_cancel_light);
+						btn_tmp.setOnClickListener(new OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								int pos = (Integer)v.getTag();
+								task_locations.remove(pos);								
+								buildLocationViews();
+							}
+						});
+						ll_tmp.addView(btn_tmp);
+					}
+					ll_locations.addView(ll_tmp);
 				}
 			}				
 	}
@@ -527,7 +563,7 @@ public class SetTaskActivity extends Activity {
 					
 					// Set Deadline
 					long deadline = task.deadline;			
-					if(deadline != -1) {
+					if(deadline != 0) {
 						// Date
 						et_deadlineDate.setText(DateFormat.getDateFormat(getApplicationContext()).format(new Date(deadline)));				
 						// Time
@@ -551,8 +587,7 @@ public class SetTaskActivity extends Activity {
 		// Update task_location list
 		location = dbHandler.getLocation(id);
 		if (task_locations != null) {
-			Log.d("updateLocationList", "Tag:"+tag+"-Size:"+task_locations.size());
-			Toast.makeText(getApplicationContext(), "Tag:"+tag+"-Size:"+task_locations.size(), Toast.LENGTH_SHORT).show();
+			
 			// Tag indicating last element means add
 			if (tag == task_locations.size()) {				
 				task_locations.add(location);					
@@ -566,6 +601,12 @@ public class SetTaskActivity extends Activity {
 		}
 		// In case there was a deletion in SetLocations
 		all_locations = dbHandler.getAllLocations();
+		for (MyLocation l:task_locations) {
+			Log.d("TASKLOCATIONS", l.id+"-"+l.name);
+		}
+		for (MyLocation l:all_locations) {
+			Log.d("ALL LOCATIONS", l.id+"-"+l.name);
+		}
 	}
 	/*
 	public void onStart() {

@@ -31,7 +31,14 @@
         android:layout_marginTop="15dp" >
 
 	</ListView>
-	 
+	
+	<Button
+	    android:id="@+id/delete_db_btn"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="Delete"
+	    android:onClick="clearTables" /> 
+	    
 	<View
 	    android:layout_width="match_parent"
 	    android:layout_height="2dp"

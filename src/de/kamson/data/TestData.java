@@ -14,11 +14,11 @@ public class TestData {
 	
 	public TestData() {
 		locations = new ArrayList<MyLocation>(); 
-		locations.add(new MyLocation(0, "BWL Bibliothek", 49.482588, 8.464097, 100));
-		locations.add(new MyLocation(1, "Schloss", 49.483606, 8.462477, 150));
-		locations.add(new MyLocation(2, "Paradeplatz", 49.487202, 8.466404, 100));
-		locations.add(new MyLocation(3, "Studienbüro", 49.484477, 8.463743, 100));
-		locations.add(new MyLocation(4, "Café Sammo A3", 49.485787, 8.461233, 100));
+		locations.add(new MyLocation(0, "BWL Bibliothek", 49.482588, 8.464097, 100, false));
+		locations.add(new MyLocation(1, "Schloss", 49.483606, 8.462477, 150, false));
+		locations.add(new MyLocation(2, "Paradeplatz", 49.487202, 8.466404, 100, false));
+		locations.add(new MyLocation(3, "Studienbüro", 49.484477, 8.463743, 100, false));
+		locations.add(new MyLocation(4, "Café Sammo A3", 49.485787, 8.461233, 100, false));
 		
 		List<MyLocation> locationAsParam = new ArrayList<MyLocation>();
 		

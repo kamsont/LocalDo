@@ -57,6 +57,8 @@ public class SetLocationActivity extends Activity {
 	private CircleOptions circleoptions;
 	private String mAddress;
 	private int mRadius;
+	private double mLat;
+	private double mLng;
 	private CustomInfoWindowAdapter iwAdapter;
 	private LatLng mLatLng;
 	
@@ -174,13 +176,13 @@ public class SetLocationActivity extends Activity {
 					
 					// Delete task from database here
 					dbHandler.deleteLocation(location.id);
-					Toast.makeText(getApplicationContext(), "Location with ID "+location.id+" deleted", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(), "Location with ID "+location.id+" deleted", Toast.LENGTH_SHORT).show();					
 				}
 				// Alert that remove operation cannot be performed
 				else {				
 					Toast.makeText(getApplicationContext(), "Deletion denied - Location still bound to another task", Toast.LENGTH_SHORT).show();
 				}
-				setResult(RESULT_OK, intent);				
+				setResult(RESULT_CANCELED, intent);				
 				break;
 			case MyConstants.ACTION_ACCEPT:	
 				// For now no correctness check of user input
@@ -190,17 +192,17 @@ public class SetLocationActivity extends Activity {
 				double latitude = location.lat;
 				double longitude = location.lng;
 				int range = location.range;
-				
+				int anonymous = location.isAnonymous ? 1 : 0;				
 				// No location ID existed before means new location
 				if (location.id == -1) {
-					location.id = dbHandler.createLocation(name, latitude, longitude, range);
+					id = dbHandler.createLocation(name, latitude, longitude, range, anonymous);
 					Toast.makeText(getApplicationContext(), "Location created", Toast.LENGTH_SHORT).show();
 				}
 				
 				// Location ID existed so we can update the database
 				else {
 					id = location.id;
-					dbHandler.updateLocations(id, name, latitude, longitude, range);
+					dbHandler.updateLocations(id, name, latitude, longitude, range, anonymous);
 					Toast.makeText(getApplicationContext(), "Location updated", Toast.LENGTH_SHORT).show();
 				}
 				
@@ -258,11 +260,14 @@ public class SetLocationActivity extends Activity {
 		}
 		
 		// Fields set in map
-		//location.lat = 0.0;		
-		//location.lng = 0.0;
+		location.lat = mLat;		
+		location.lng = mLng;
 		
 		// Field set in InfoWindow
-		//location.range = -1;
+		location.range = mRadius;
+		
+		//
+		//location.isAnonymous = 
 	}
 	
 	private void setUpMap() {
@@ -272,23 +277,7 @@ public class SetLocationActivity extends Activity {
 	                            .getMap();
 	        // Check if we were successful in obtaining the map.
 	        if (mMap != null) {
-	            // If New Location was chosen, get use location that was requested in MainActivity  	
-	        	if(operating_mode == MyConstants.MODE_ADD) {
-	        		if (MainActivity.mLocation != null) {
-	        			mLatLng = new LatLng(MainActivity.mLocation.getLatitude(), MainActivity.mLocation.getLongitude());
-	        		}
-	        		else
-	        			mLatLng = MANNHEIM_SCHLOSS;
-	        		// Get the address for own position
-	        		mAddress = getAddress(mLatLng);	
-	        		
-	        		// Standard range for new locations
-	        		mRadius = 100;
-	        		
-	        	}	        	
-	        	        	
-	        	et_locationAddress.setText(mAddress);
-	        	iwAdapter = new CustomInfoWindowAdapter(this, R.layout.custom_info_window);
+	            iwAdapter = new CustomInfoWindowAdapter(this, R.layout.custom_info_window);
 	        	iwAdapter.setTitle(mAddress);
 	        	iwAdapter.setRadius(mRadius);	        	
 	        	mMap.setInfoWindowAdapter(iwAdapter);
@@ -312,8 +301,8 @@ public class SetLocationActivity extends Activity {
 						// TODO Auto-generated method stub
 						mAddress = getAddress(point);
 						et_locationAddress.setText(mAddress);
-						location.lat = point.latitude;
-						location.lng = point.longitude;
+						mLat = point.latitude;
+						mLng = point.longitude;
 						mMarker.remove();
 						iwAdapter.setTitle(mAddress);
 						iwAdapter.setRadius(mRadius);						
@@ -333,14 +322,14 @@ public class SetLocationActivity extends Activity {
 						et_input.setInputType(InputType.TYPE_CLASS_NUMBER);
 						et_input.setText(String.valueOf(mRadius));
 						et_input.setTextColor(0xff000000);
+						et_input.setBackgroundColor(0x00000000);
 						new AlertDialog.Builder(SetLocationActivity.this)
 					    .setTitle("Change Radius in m")
 					    //.setMessage("You can change the radius")
 					    .setView(et_input)
 					    .setPositiveButton(R.string.infowindow_dialog, new DialogInterface.OnClickListener() {
 					        public void onClick(DialogInterface dialog, int whichButton) {
-					            mRadius = Integer.parseInt(et_input.getText().toString());
-					            location.range = mRadius;
+					            mRadius = Integer.parseInt(et_input.getText().toString());					           
 					            iwAdapter.setRadius(mRadius);
 					            mMarker.showInfoWindow();
 								mCircle.setRadius(mRadius);
@@ -407,13 +396,34 @@ public class SetLocationActivity extends Activity {
 	}
 	
 	private void fillInData() {
-		mLatLng = new LatLng(location.lat, location.lng);
-		mAddress = getAddress(mLatLng);
+		
 		if (location.id != -1) {
-			et_locationName.setText(location.name);
-			et_locationAddress.setText(mAddress);
+			mLatLng = new LatLng(location.lat, location.lng);
+			mAddress = getAddress(mLatLng);
+			et_locationName.setText(location.name);			
+			mLat = location.lat;
+			mLng = location.lng;
 			mRadius = location.range;
+			// If location is anonymous then uncheck checkbox
+			cb_addLocation.setChecked(!location.isAnonymous);
 		}
+		// If New Location was chosen, get user location that was requested in MainActivity  	
+		else if(operating_mode == MyConstants.MODE_ADD) {
+    		if (MainActivity.mLocation != null) {
+    			mLatLng = new LatLng(MainActivity.mLocation.getLatitude(), MainActivity.mLocation.getLongitude());
+    		}
+    		else {
+    			mLatLng = MANNHEIM_SCHLOSS;    			
+    		}
+	    		// Standard range for new locations
+	    		mRadius = 100;
+        		// Get the address 
+        		mAddress = getAddress(mLatLng);
+        		mLat = mLatLng.latitude;
+        		mLng = mLatLng.longitude;
+        		
+    	}	  
+    	et_locationAddress.setText(mAddress);
 	}
 	/*
 	public void onStart() {

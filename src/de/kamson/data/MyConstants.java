@@ -1,6 +1,8 @@
 package de.kamson.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MyConstants {
 	public final static String TASK_ID = "task_id";
@@ -74,4 +76,32 @@ public class MyConstants {
 		STRING_TO_DEADLINETIME.put("2 days", (2*24*60*60*1000));
 		STRING_TO_DEADLINETIME.put("7 days", (7*24*60*60*1000)); // still fits in integer
 	}
+	
+	public final static HashMap<Integer, String> DEADLINETIME_TO_STRING = new HashMap<Integer, String>();	
+	static{ 
+		DEADLINETIME_TO_STRING.put((5*60*1000), "5 min");
+		DEADLINETIME_TO_STRING.put((10*60*1000), "10 min");
+		DEADLINETIME_TO_STRING.put((30*60*1000), "30 min");
+		DEADLINETIME_TO_STRING.put((1*60*60*1000), "1 h");
+		DEADLINETIME_TO_STRING.put((4*60*60*1000), "4 h");
+		DEADLINETIME_TO_STRING.put((12*60*60*1000), "12 h");
+		DEADLINETIME_TO_STRING.put((1*24*60*60*1000), "1 day");
+		DEADLINETIME_TO_STRING.put((2*24*60*60*1000), "2 days");
+		DEADLINETIME_TO_STRING.put((7*24*60*60*1000), "7 days"); // still fits in integer
+	}
+	
+	public final static List<Long> DEADLINETIMES = new ArrayList<Long>();
+	static {
+		DEADLINETIMES.add(5*60*1000l);
+		DEADLINETIMES.add(10*60*1000l); 
+		DEADLINETIMES.add(30*60*1000l);
+		DEADLINETIMES.add(1*60*60*1000l);
+		DEADLINETIMES.add(4*60*60*1000l);
+		DEADLINETIMES.add(12*60*60*1000l);
+		DEADLINETIMES.add(1*24*60*60*1000l);
+		DEADLINETIMES.add(2*24*60*60*1000l);
+		DEADLINETIMES.add(7*24*60*60*1000l);
+	}
+	
+	
 }

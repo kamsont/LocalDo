@@ -41,13 +41,15 @@ public class DBHelper extends SQLiteOpenHelper {
 	public static final String LOCATIONS_COLUMN_LATITUDE = "latitude";
 	public static final String LOCATIONS_COLUMN_LONGITUDE = "longitude";
 	public static final String LOCATIONS_COLUMN_RANGE = "range";
+	public static final String LOCATIONS_COLUMN_ANONYMOUS = "anonymous";
 	
 	private static final String TABLE_LOCATIONS_CREATE = "CREATE TABLE " +  
 	        TABLE_LOCATIONS + " (" + LOCATIONS_COLUMN_ID + " integer primary key autoincrement, " + 	 
 	        LOCATIONS_COLUMN_NAME + " String, " +
 	        LOCATIONS_COLUMN_LATITUDE + " integer, " +
 	        LOCATIONS_COLUMN_LONGITUDE + " integer, " +
-	        LOCATIONS_COLUMN_RANGE + " integer);";
+	        LOCATIONS_COLUMN_RANGE + " integer," +
+	        LOCATIONS_COLUMN_ANONYMOUS + " integer);";
 	
 	/*
 	 * Task_Location-table
