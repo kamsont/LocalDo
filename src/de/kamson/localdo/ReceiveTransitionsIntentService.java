@@ -125,9 +125,7 @@ public class ReceiveTransitionsIntentService extends IntentService{
 
         // Set the notification contents
         builder.setSmallIcon(R.drawable.ic_launcher)
-               .setContentTitle(
-                       getString(R.string.geofence_transition_notification_title,
-                               transitionType, ids))
+               .setContentTitle(ids)
                .setContentText(getString(R.string.geofence_transition_notification_text))
                .setSmallIcon(R.drawable.localdo_logo)
                .setAutoCancel(true)

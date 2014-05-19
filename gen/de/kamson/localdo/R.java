@@ -243,9 +243,7 @@ containing a value of this type.
         public static final int action_accept=0x7f060032;
         public static final int action_cancel=0x7f060031;
         public static final int action_discard=0x7f060033;
-        public static final int action_manageLocations=0x7f060036;
         public static final int action_new=0x7f060034;
-        public static final int action_options=0x7f060037;
         public static final int action_sortBy=0x7f060035;
         public static final int active_tasks_list=0x7f060007;
         public static final int active_tasks_title=0x7f060005;

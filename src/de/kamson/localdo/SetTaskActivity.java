@@ -475,6 +475,8 @@ public class SetTaskActivity extends Activity {
 	}
 	
 	private static void activateDeadlineAlert() {
+		if (task.deadline_alert == 0)
+			cb_alertTime.setChecked(false);
 		cb_alertTime.setVisibility(View.VISIBLE);// checkbox alert anzeigen
 		spinner_alertTime.setVisibility(View.VISIBLE);// spinner alert time anzeigen
 		spinner_alertTime.setSelection(MyConstants.DEADLINETIMES.indexOf(task.deadline_alert));

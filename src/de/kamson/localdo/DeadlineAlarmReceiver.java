@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 public class DeadlineAlarmReceiver extends BroadcastReceiver{
 
@@ -43,6 +44,7 @@ public class DeadlineAlarmReceiver extends BroadcastReceiver{
 
         // Issue the notification
         mNotificationManager.notify(0, builder.build());
+        Log.d("ALARM", "RECEIVED");
 	}
 
 }
