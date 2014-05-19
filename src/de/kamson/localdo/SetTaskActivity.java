@@ -83,7 +83,8 @@ public class SetTaskActivity extends Activity {
 	private int operating_mode;
 	
 	// Field to get the Userinput Time
-	private static int deadlineTime;
+	private static long deadlineDate;
+	private static long deadlineTime;
 	
 	
 	@Override
@@ -323,7 +324,7 @@ public class SetTaskActivity extends Activity {
 	
 	public void readUserInput() {
 		task.name = et_taskName.getText().toString();
-		task.deadline += deadlineTime;
+		task.deadline = deadlineDate + deadlineTime;
 		//task.deadline_alert already exist
 		task.isActive = true;
 		//task.color already exist
@@ -433,7 +434,7 @@ public class SetTaskActivity extends Activity {
 		public void onTimeSet(TimePicker view, int hour, int min) {
 			int time = ((hour*3600)+(min*60))*1000;
 			deadlineTime = time;
-			et_deadlineTime.setText(DateFormat.getTimeFormat(mContext.getApplicationContext()).format(new Date(task.deadline+time)));
+			et_deadlineTime.setText(DateFormat.getTimeFormat(mContext.getApplicationContext()).format(new Date(deadlineDate+deadlineTime)));
 			//et_deadlineTime.setText(hour + ":" + min);
 			activateDeadlineAlert();
 			
@@ -457,8 +458,8 @@ public class SetTaskActivity extends Activity {
 		}
 		
 		public void onDateSet(DatePicker view, int year, int month, int day){
-			task.deadline = new GregorianCalendar(year, (month), day).getTimeInMillis();
-			et_deadlineDate.setText(DateFormat.getDateFormat(mContext.getApplicationContext()).format(new GregorianCalendar(year, (month), day).getTime()));
+			deadlineDate = new GregorianCalendar(year, (month), day).getTimeInMillis();
+			et_deadlineDate.setText(DateFormat.getDateFormat(mContext.getApplicationContext()).format(new Date(deadlineDate)));
 			//et_deadlineDate.setText(day + "." + (month+1) + "." + year);
 			et_deadlineDate.setLayoutParams(new LinearLayout.LayoutParams(0,LayoutParams.WRAP_CONTENT, 1));
 			et_deadlineTime.setLayoutParams(new LinearLayout.LayoutParams(0,LayoutParams.WRAP_CONTENT, 1));

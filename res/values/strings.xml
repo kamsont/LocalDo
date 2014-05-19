@@ -8,7 +8,7 @@
     <string name="action_cancel">Cancel</string>
     <string name="action_edit">Edit</string>
     <string name="action_discard">Delete</string>
-    <string name="action_sortBy">Sort by</string>
+    <string name="action_sortBy">Sort by distance</string>
     <string name="action_manageLocations">Manage Locations</string>
     <string name="action_options">Options</string>
     <string name="active_tasks_title">2 tasks to do</string>

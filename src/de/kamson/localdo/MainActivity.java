@@ -97,6 +97,8 @@ public class MainActivity extends Activity {
 	List<Task> finished_tasks;
 	List<MyLocation> locations;
 	
+	List<Integer> distancesToMe;
+	
 	static final int TASKS_LIST = 1;
 	static final int ACTIVE_TASKS_LIST = 2;
 	static final int FINISHED_TASKS_LIST = 3;
@@ -578,8 +580,75 @@ public class MainActivity extends Activity {
 		 Toast.makeText(getApplicationContext(), "Table cleared", Toast.LENGTH_SHORT).show();
 	 }
 	 
-	 public void sortTasks() {
+	 public void sortActiveTasks(MenuItem item) {
+		 calculateDistances();
+		 List<Task> tmpList = new ArrayList<Task>();
+		 int pos = 0;
+		 int length = active_tasks.size();
+		 for (int i = 0; i<length;i++) {
+			 pos = getMinFromList(distancesToMe);
+			 tmpList.add(i, active_tasks.remove(pos));
+			 distancesToMe.remove(pos);
+			 
+		 }
+		 active_tasks = tmpList;
+		 updateListViews();
+		 updateListTitle();
+		 active_adapter.notifyDataSetChanged();
+	 }
+	 
+	 private void calculateDistances() {
 		 
+		 distancesToMe = new ArrayList<Integer>();
+		 mGeofenceRequester.getLocation();
+		 Location location;
+		 List<MyLocation> tmp_locs;
+		 int i = 0;
+		 int distance = 0;
+		 if ((active_tasks.size() != 0) && (MainActivity.mLocation != null)) {
+			 for(Task t:active_tasks) {
+				 tmp_locs = dbHandler.getLocationsToTask(t.id);
+				 int j = 0;
+				 if (tmp_locs.size() != 0) {
+					 for(MyLocation mLoc:tmp_locs) {
+						location = new Location("");
+						location.setLatitude(mLoc.lat);
+						location.setLongitude(mLoc.lng);
+						// Calculate distance for this location
+						distance = (int)location.distanceTo(MainActivity.mLocation);
+						// For more than one locations compare the distances
+						if (j>0) {
+							// Replace distance if smaller
+							if (distance < distancesToMe.get(i)) {
+								distancesToMe.set(i, distance);
+							}							
+						}
+						// No value existed before
+						else {
+							distancesToMe.add(distance);
+						}
+						j++;
+					 }
+				 }
+				 // If no location exist we assign a MaxInteger as distance to location
+				 else {
+					 distancesToMe.add(Integer.MAX_VALUE); 
+				 }
+				 i++;
+			 }
+		 }
+	 }
+	 
+	 private int getMinFromList(List<Integer> list) {
+		 int index = 0;
+		 int small = (int)list.get(index); 
+		 for (int i=1;i<list.size(); i++) {
+			 if ((int)list.get(i)<small) {
+				 index = i;
+				 small = (int)list.get(i); 
+			 }
+		 }
+		 return index;
 	 }
 	 
 	 /*
