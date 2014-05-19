@@ -20,7 +20,9 @@
 	    android:id="@+id/location_address" 
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:hint="@string/location_address" />
+	    android:hint="@string/location_address"
+	    android:clickable="false"
+	    android:focusable="false" />
 	
 	
     <CheckBox 
@@ -38,7 +40,7 @@
 	  android:layout_width="match_parent"
 	  android:layout_height="0dp"
 	  android:layout_weight="1" />
-	
+	<!-- 
 	<CheckBox 
         android:id="@+id/setLocation_cb_setAlert"
         android:layout_width="wrap_content"
@@ -64,6 +66,6 @@
             android:prompt="@string/setAlert_distances_spinner_prompt"  
              />
 	</LinearLayout>
-	
+	 -->
     
 </LinearLayout>

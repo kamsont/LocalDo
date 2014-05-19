@@ -33,7 +33,7 @@ public class CustomInfoWindowAdapter implements InfoWindowAdapter{
 		tv_info1 = (TextView)view.findViewById(R.id.infowindow_info1);
 		tv_info2 = (TextView)view.findViewById(R.id.infowindow_info2);
 		tv_title.setText(title);
-		tv_info1.setText("Radius: "+radius+"m");		
+		tv_info1.setText("Alert Radius: "+radius+"m");		
 		return view;
 	}
 

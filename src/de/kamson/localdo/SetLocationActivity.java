@@ -91,23 +91,23 @@ public class SetLocationActivity extends Activity {
 		et_locationName = (EditText)findViewById(R.id.location_name);
 		et_locationAddress = (EditText)findViewById(R.id.location_address);
 		cb_addLocation = (CheckBox)findViewById(R.id.setLocation_cb_addLocationToList);
-		cb_addLocationAlert = (CheckBox)findViewById(R.id.setLocation_cb_setAlert);
-		spinner_locationRanges = (Spinner)findViewById(R.id.setLocation_spinner_distances);
-		spinner_locationRanges.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> arg0, View arg1,
-					int arg2, long arg3) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		//cb_addLocationAlert = (CheckBox)findViewById(R.id.setLocation_cb_setAlert);
+		//spinner_locationRanges = (Spinner)findViewById(R.id.setLocation_spinner_distances);
+//		spinner_locationRanges.setOnItemSelectedListener(new OnItemSelectedListener() {
+//
+//			@Override
+//			public void onItemSelected(AdapterView<?> arg0, View arg1,
+//					int arg2, long arg3) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//
+//			@Override
+//			public void onNothingSelected(AdapterView<?> arg0) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//		});
 		
 		fillInData();
 		// Add map
