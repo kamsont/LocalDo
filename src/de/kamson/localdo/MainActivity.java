@@ -26,6 +26,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -144,6 +145,8 @@ public class MainActivity extends Activity {
 		// Build a list of geofences build from locations that are bound to an active task
 		createGeofencesList();
 		
+		// 
+		setDeadlineAlarm();
 		// Build the listviews for active and finished task lists
 		updateListViews();
 		
@@ -453,11 +456,20 @@ public class MainActivity extends Activity {
 	
 	public void shiftItem(int pos, int list){
 		// Remove task from active list and add to finished list
+		Task t;
 		if(list == ACTIVE_TASKS_LIST){
+			// DB update
+			t = (Task)active_tasks.get(pos);
+			dbHandler.updateTasks(t.id, t.name, t.deadline, t.deadline_alert, 0, t.color, t.notes);
+			// Visual update
 			finished_tasks.add(active_tasks.remove(pos));
 		}
 		// Remove task from finished list and add to active list
 		else{
+			// DB update
+			t = (Task)finished_tasks.get(pos);
+			dbHandler.updateTasks(t.id, t.name, t.deadline, t.deadline_alert, 1, t.color, t.notes);
+			// Visual update
 			active_tasks.add(finished_tasks.remove(pos));
 		}
 		updateListTitle();
@@ -468,6 +480,12 @@ public class MainActivity extends Activity {
 	public void updateListTitle() {
 		active_listTitle = (TextView)findViewById(R.id.active_tasks_title);
 		active_listTitle.setText(active_tasks.size() + " tasks to do");
+		View v = (View)findViewById(R.id.invisible_space);
+		if (active_tasks.size() == 0) {			
+			v.setVisibility(View.VISIBLE);
+		}
+		else
+			v.setVisibility(View.GONE);
 		finished_listTitle = (TextView)findViewById(R.id.finished_tasks_title);
 		finished_listTitle.setText(finished_tasks.size() + " tasks finished");
 	}
@@ -535,11 +553,33 @@ public class MainActivity extends Activity {
 	        }
 	    }
 	 
+	 public void setDeadlineAlarm() {		 
+			for(Task task: active_tasks) {				
+					if (task.deadline_alert != 0) {
+					
+						Intent intentAlarm = new Intent(this, DeadlineAlarmReceiver.class);
+						intentAlarm.putExtra(MyConstants.TASK_NAME, task.name);
+			            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+			            
+			            // Time is calculated 
+			            long time = task.deadline-task.deadline_alert;
+			           
+			            // Set the alarm for particular time
+			            alarmManager.set(AlarmManager.RTC_WAKEUP,time, PendingIntent.getBroadcast(this,1,  intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+				}
+			}
+				
+	 }
+	 
 	 public void clearTables(View v) {
 		 //dbHandler.clearTasks();
 		// dbHandler.clearLocations();
 		 dbHandler.clearTasks_Locations();
 		 Toast.makeText(getApplicationContext(), "Table cleared", Toast.LENGTH_SHORT).show();
+	 }
+	 
+	 public void sortTasks() {
+		 
 	 }
 	 
 	 /*

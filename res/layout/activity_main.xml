@@ -22,8 +22,14 @@
 	    android:layout_height="1dp"
 	    android:background="#000000"  	   
 	    android:layout_marginLeft="16dp"
-	    android:layout_marginRight="16dp"/>    
-	    
+	    android:layout_marginRight="16dp"/> 
+	       
+	<View
+	    android:id="@+id/invisible_space"
+	    android:layout_width="match_parent"
+	    android:layout_height="50dp"
+	    android:visibility="gone"/>
+	        
     <ListView
         android:id="@+id/active_tasks_list"
         android:layout_width="match_parent"
@@ -32,19 +38,21 @@
 
 	</ListView>
 	
+	<!-- 
 	<Button
 	    android:id="@+id/delete_db_btn"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:text="Delete"
 	    android:onClick="clearTables" /> 
-	    
+	 -->
+	     
 	<View
 	    android:layout_width="match_parent"
 	    android:layout_height="2dp"
 	    android:background="#000000"
 	    android:layout_marginTop="15dp" 
-	    android:layout_marginBottom="10dp"/>
+	    android:layout_marginBottom="20dp"/>
 	
 	<TextView
 	    android:id="@+id/finished_tasks_title"

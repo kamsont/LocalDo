@@ -19,6 +19,8 @@ public class MyConstants {
 	public final static String LOCATIOIN_LONGITUDE = "longitude";
 	public final static String LOCATION_RANGE = "range";
 	
+	public final static String DIALOG_MESSAGE = "dialog_message";
+	
 	public final static int REQUESTCODE_SETTASK = 0;
 	public final static int REQUESTCODE_SETLOCATION = 1;
 	
@@ -31,6 +33,7 @@ public class MyConstants {
 	public final static int YELLOW = 0xffffff00;
 	public final static int GREEN = 0xff00ff00;
 	public final static int NO_COLOR = 0x00000000; //alpha set to 0, color does not matter
+	
 	
 	public final static String OPERATING_MODE = "operating_mode";
 	public final static int MODE_ADD = 0;

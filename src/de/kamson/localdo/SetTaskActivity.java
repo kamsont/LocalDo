@@ -1,5 +1,6 @@
 package de.kamson.localdo;
 
+import java.text.ChoiceFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -68,6 +69,8 @@ public class SetTaskActivity extends Activity {
 	static EditText et_notes;
 	//static EditText et_clickedLocation;
 	
+	DialogFragment df;
+	
 	int tag;
 	static Task task;
 	static MyLocation location;
@@ -75,7 +78,12 @@ public class SetTaskActivity extends Activity {
 	static List<MyLocation> task_locations;
 	static List<MyLocation> all_locations;
 	
+	static List<MyLocation> choiceList;
+	
 	private int operating_mode;
+	
+	// Field to get the Userinput Time
+	private static int deadlineTime;
 	
 	
 	@Override
@@ -150,7 +158,13 @@ public class SetTaskActivity extends Activity {
 			return true;
 		case R.id.action_accept:
 			Toast.makeText(getApplicationContext(), "Save Task", Toast.LENGTH_SHORT).show();
-			backToMain(MyConstants.ACTION_ACCEPT);
+			if (et_taskName.getText().length() == 0) {				
+				df = new MyDialogFragment().newInstance("Please give your task a name");				
+				df.show(getFragmentManager(), "AnonymousDialog");
+			}
+			else {
+				backToMain(MyConstants.ACTION_ACCEPT);
+			}
 			return true; 
 		case R.id.action_cancel:
 			Toast.makeText(getApplicationContext(), "Abort", Toast.LENGTH_SHORT).show();
@@ -309,7 +323,7 @@ public class SetTaskActivity extends Activity {
 	
 	public void readUserInput() {
 		task.name = et_taskName.getText().toString();
-		//task.deadline already exist
+		task.deadline += deadlineTime;
 		//task.deadline_alert already exist
 		task.isActive = true;
 		//task.color already exist
@@ -326,6 +340,7 @@ public class SetTaskActivity extends Activity {
 		public Dialog onCreateDialog(Bundle savedInstanceState) { 
 			// Setup the choice list consisting of all locations
 			List<String> tmp = new ArrayList<String>();
+			choiceList = new ArrayList<MyLocation>();
 			// In any case assign the possibility to add a new location as first choice
 			tmp.add("New Location");
 			// No location exist
@@ -335,9 +350,9 @@ public class SetTaskActivity extends Activity {
 					if (!location.isAnonymous) {
 						// Sort out the locations that are already bound to this task
 						
-						Log.d("EVALUATE CONTAINING", location.name);
+						
 						if (!(task_locations.contains(location))) {
-							Log.d("TASKLOCATIONS CONTAINS NO", location.name);
+							choiceList.add(location);
 							tmp.add(location.name);							
 						}
 					}
@@ -361,7 +376,7 @@ public class SetTaskActivity extends Activity {
 						else {
 							// The choice corresponds to the all locations list so get the location her
 							// The parameter needs to be incremented because of New location on position 1 that does not exist in all locations
-							location = all_locations.get(which-1);
+							location = choiceList.get(which-1);
 							intent.putExtra(MyConstants.OPERATING_MODE, MyConstants.MODE_EDIT);
 							intent.putExtra(MyConstants.LOCATION_ID, location.id);
 						}
@@ -374,8 +389,8 @@ public class SetTaskActivity extends Activity {
 	}
 	
 	public void showLocationDialog(View v) {
-		DialogFragment newFragment = new LocationDialogFragment();
-		newFragment.show(getFragmentManager(), "locationDialog");
+		df = new LocationDialogFragment();
+		df.show(getFragmentManager(), "locationDialog");
 	}
 	
 	public static class ColorDialogFragment extends DialogFragment {		
@@ -401,8 +416,8 @@ public class SetTaskActivity extends Activity {
 	}
 	
 	public void showColorDialog(View v) {
-		DialogFragment newFragment = new ColorDialogFragment();
-		newFragment.show(getFragmentManager(), "colorDialog");
+		df = new ColorDialogFragment();
+		df.show(getFragmentManager(), "colorDialog");
 	}
 	
 	public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
@@ -416,16 +431,18 @@ public class SetTaskActivity extends Activity {
 		}
 		
 		public void onTimeSet(TimePicker view, int hour, int min) {
-			task.deadline += ((hour*3600)+(min*60))*1000;
-			et_deadlineTime.setText(hour + ":" + min);
+			int time = ((hour*3600)+(min*60))*1000;
+			deadlineTime = time;
+			et_deadlineTime.setText(DateFormat.getTimeFormat(mContext.getApplicationContext()).format(new Date(task.deadline+time)));
+			//et_deadlineTime.setText(hour + ":" + min);
 			activateDeadlineAlert();
 			
 		}
 	}
 	
 	public void showTimePickerDialog(View v) {
-		DialogFragment newFragment = new TimePickerFragment();
-		newFragment.show(getFragmentManager(), "timepicker");
+		df = new TimePickerFragment();
+		df.show(getFragmentManager(), "timepicker");
 	}
 	
 	public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
@@ -440,8 +457,9 @@ public class SetTaskActivity extends Activity {
 		}
 		
 		public void onDateSet(DatePicker view, int year, int month, int day){
-			task.deadline = new GregorianCalendar(year, month, day).getTimeInMillis();
-			et_deadlineDate.setText(day + "." + (month+1) + "." + year);
+			task.deadline = new GregorianCalendar(year, (month), day).getTimeInMillis();
+			et_deadlineDate.setText(DateFormat.getDateFormat(mContext.getApplicationContext()).format(new GregorianCalendar(year, (month), day).getTime()));
+			//et_deadlineDate.setText(day + "." + (month+1) + "." + year);
 			et_deadlineDate.setLayoutParams(new LinearLayout.LayoutParams(0,LayoutParams.WRAP_CONTENT, 1));
 			et_deadlineTime.setLayoutParams(new LinearLayout.LayoutParams(0,LayoutParams.WRAP_CONTENT, 1));
 			et_deadlineTime.setVisibility(View.VISIBLE);
@@ -451,8 +469,8 @@ public class SetTaskActivity extends Activity {
 	}
 	
 	public void showDatePickerDialog(View v) {
-		DialogFragment newFragment = new DatePickerFragment();
-		newFragment.show(getFragmentManager(), "datePicker");
+		df = new DatePickerFragment();
+		df.show(getFragmentManager(), "datePicker");
 	}
 	
 	private static void activateDeadlineAlert() {
@@ -536,7 +554,7 @@ public class SetTaskActivity extends Activity {
 						btn_tmp.setTag(i);
 						btn_tmp.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
 						//btn_tmp.setWidth((int)(gl_locations.getWidth()*0.2));
-						btn_tmp.setBackgroundResource(R.drawable.ic_action_cancel_light);
+						btn_tmp.setBackgroundResource(R.drawable.ic_action_discard);
 						btn_tmp.setOnClickListener(new OnClickListener() {
 							
 							@Override

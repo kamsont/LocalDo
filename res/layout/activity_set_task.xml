@@ -125,6 +125,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/setTask_notes"
         android:lines="6"
+        android:paddingLeft="5dp"
         android:gravity="top|left"
         android:background="#ffffff"/>
 

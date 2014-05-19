@@ -61,14 +61,15 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 		// Get the locations bound to this task
 		List<MyLocation> task_locations = dbHandler.getLocationsToTask(task.id);
 		// Distances from my position
-		List<Float> distances = new ArrayList<Float>();
+		List<Integer> distances = new ArrayList<Integer>();
 		Location location;
+		gfr.getLocation();
 		if (MainActivity.mLocation != null) {
 			for(MyLocation mLoc:task_locations) {
 				location = new Location("");
 				location.setLatitude(mLoc.lat);
 				location.setLongitude(mLoc.lng);
-				distances.add(location.distanceTo(MainActivity.mLocation));
+				distances.add((int)location.distanceTo(MainActivity.mLocation));
 			}
 		}
 		else
@@ -89,7 +90,7 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 			for (MyLocation mLoc:task_locations) {
 				text += mLoc.name;
 				if (distances.size() != 0) {
-					text += " ("+distances.get(i)+"m away)";
+					text += " ("+distances.get(i)+"m)";
 				}
 				if (i<task_locations.size()-1) {
 					text += "; ";

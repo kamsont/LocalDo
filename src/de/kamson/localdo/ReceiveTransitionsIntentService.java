@@ -129,6 +129,8 @@ public class ReceiveTransitionsIntentService extends IntentService{
                        getString(R.string.geofence_transition_notification_title,
                                transitionType, ids))
                .setContentText(getString(R.string.geofence_transition_notification_text))
+               .setSmallIcon(R.drawable.localdo_logo)
+               .setAutoCancel(true)
                .setContentIntent(notificationPendingIntent);
 
         // Get an instance of the Notification manager

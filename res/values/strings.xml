@@ -20,6 +20,7 @@
     <string name="no_resolution">Google Play services: unable to resolve connection error.</string>
     <string name="play_services_available">Location Services is available</string>
     <string name="unknown_activity_request_code">Received an unknown activity request code %1$d in onActivityResult.</string>
+    <string name="deadline_alarm_title">It\'s time</string>
     <string name="add_geofences_result_success">Add Geofences: Success GeofenceRequestIds=%1$s</string>
     <string name="add_geofences_result_failure">Add Geofences: Failure, error code %1$d GeofenceRequestIds=%2$s</string>
     <string name="add_geofences_already_requested_error">
