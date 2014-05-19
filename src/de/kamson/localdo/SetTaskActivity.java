@@ -324,7 +324,7 @@ public class SetTaskActivity extends Activity {
 	
 	public void readUserInput() {
 		task.name = et_taskName.getText().toString();
-		task.deadline = deadlineDate + deadlineTime;
+		task.deadline = deadlineDate+deadlineTime;
 		//task.deadline_alert already exist
 		task.isActive = true;
 		//task.color already exist
@@ -583,6 +583,10 @@ public class SetTaskActivity extends Activity {
 					// Set Deadline
 					long deadline = task.deadline;			
 					if(deadline != 0) {
+						GregorianCalendar cal = new GregorianCalendar();
+						cal.setTimeInMillis(task.deadline);
+						deadlineTime = (cal.get(Calendar.HOUR_OF_DAY)*60 + cal.get(Calendar.MINUTE))*60*1000;
+						deadlineDate = task.deadline-deadlineTime;
 						// Date
 						et_deadlineDate.setText(DateFormat.getDateFormat(getApplicationContext()).format(new Date(deadline)));				
 						// Time
@@ -598,6 +602,7 @@ public class SetTaskActivity extends Activity {
 					
 					// set Color					
 					et_color.setText(MyConstants.COLOR_TO_STRING.get(task.color));
+					et_notes.setText(task.notes);
 				}
 				buildLocationViews();
 	}

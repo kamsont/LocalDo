@@ -1,6 +1,7 @@
 package de.kamson.localdo;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -568,6 +569,10 @@ public class MainActivity extends Activity {
 			           
 			            // Set the alarm for particular time
 			            alarmManager.set(AlarmManager.RTC_WAKEUP,time, PendingIntent.getBroadcast(this,1,  intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+			            long now = (new Date().getTime());
+			            Log.d("ALARM SET NOW" , ""+ now);
+			            Log.d("ALARM SET TIME" , ""+ time);
+			            Log.d("ALARM SET DIFF" , ""+ (now-time));
 				}
 			}
 				

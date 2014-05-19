@@ -147,7 +147,8 @@ public class SetLocationActivity extends Activity {
 			//
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
-			NavUtils.navigateUpFromSameTask(this);
+			//NavUtils.navigateUpFromSameTask(this);
+			backToSetTask(MyConstants.ACTION_CANCEL);
 			return true;
 		case R.id.action_accept:		
 			backToSetTask(MyConstants.ACTION_ACCEPT);
