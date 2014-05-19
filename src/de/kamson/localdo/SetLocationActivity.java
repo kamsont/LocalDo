@@ -267,7 +267,8 @@ public class SetLocationActivity extends Activity {
 		location.range = mRadius;
 		
 		//
-		//location.isAnonymous = 
+		
+		location.isAnonymous = !cb_addLocation.isChecked();
 	}
 	
 	private void setUpMap() {
