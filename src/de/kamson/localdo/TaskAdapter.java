@@ -80,6 +80,7 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 		// Sort location list by distance - same method as in main for tasks
 		if (distances.size() != 0) {
 			List<MyLocation> tmpList = new ArrayList<MyLocation>();
+			List<Integer> tmpDistances = new ArrayList<Integer>();
 			 int pos = 0;
 			 int length = task_locations.size();
 			 for (int i = 0; i<length;i++) {
@@ -87,12 +88,12 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 				 // Get nearest location
 				 pos = MainActivity.getMinFromList(distances);
 				 
-				 // Rebuild the list - nearest on top
+				 // Rebuild the lists - nearest on top
 				 tmpList.add(i, task_locations.remove(pos));
-				 distances.remove(pos);
+				 tmpDistances.add(distances.remove(pos));
 				 
 			 }
-		 
+			 distances = tmpDistances;
 			 task_locations = tmpList;
 		}
 		
