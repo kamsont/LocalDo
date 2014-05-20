@@ -18,7 +18,6 @@ import de.kamson.localdo.GeofenceUtils.*;
 import de.kamson.data.DBHandler;
 import de.kamson.data.MyConstants;
 import de.kamson.data.MyLocation;
-import de.kamson.data.TestData;
 import de.kamson.data.Task;
 import de.kamson.data.MyConstants;
 import android.location.Criteria;
@@ -44,7 +43,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+/**
+ * The main displays all tasks to the user separated by active/finished status
+ * 
+ * @author all
+ *
+ */
 public class MainActivity extends Activity {
 	
 	/*
@@ -71,35 +75,37 @@ public class MainActivity extends Activity {
     /*
      * Location variables
      */
-    // Position is requested in GeoRequester
+    // Own Position is requested in GeoRequester
 	public static Location mLocation;
-	LocationClient mLocationClient;
-	LocationRequest mLocationRequest;
-	LocationManager mLocationManager;
-	private PendingIntent mGeofenceRequestIntent;
-	private PendingIntent mTransitionPendingIntent;
-	String provider;
+	LocationClient mLocationClient;	
 	
 	/* 
 	 * UI variables 
 	 */
+	// The lists
 	ListView active_tasks_lv;
 	ListView finished_tasks_lv;
+	// The adapter to the list
+	TaskAdapter active_adapter;
+	TaskAdapter finished_adapter;
+	// The titles to display how many tasks
 	TextView active_listTitle;
 	TextView finished_listTitle;	
 	
 	/*
 	 * List variables
-	 */
-	TaskAdapter active_adapter;
-	TaskAdapter finished_adapter;
+	 */	
 	List<Task> tasks;	
 	List<Task> active_tasks;
 	List<Task> finished_tasks;
-	List<MyLocation> locations;
-	
+	List<MyLocation> locations;	
+	// Every task gets exactly one distance assigned
 	List<Integer> distancesToMe;
+	Task chosenTask;
 	
+	/*
+	 * Some constants that are only use in this activity
+	 */
 	static final int TASKS_LIST = 1;
 	static final int ACTIVE_TASKS_LIST = 2;
 	static final int FINISHED_TASKS_LIST = 3;
@@ -107,30 +113,6 @@ public class MainActivity extends Activity {
 	
 	// Database variables
 	DBHandler dbHandler;
-	
-	// Global state variable
-	GlobalState gs;
-	// Milliseconds per second
-    private static final int MILLISECONDS_PER_SECOND = 1000;
-    // Update frequency in seconds
-    public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
-    // Update frequency in milliseconds
-    private static final long UPDATE_INTERVAL =
-            MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
-    // The fastest update frequency, in seconds
-    private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
-    // A fast frequency ceiling in milliseconds
-    private static final long FASTEST_INTERVAL =
-            MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;   
-   
-	
-	public Task chosenTask;
-	public Animation anim_Move;
-	public TestData testData;
-
-	
-	
-		
 		
 	
 	
@@ -139,43 +121,24 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState); 		
 		setContentView(R.layout.activity_main);		
 		
-		// To follow lifecycle of the activity
-		//Toast.makeText(this, "Main onCreate called", Toast.LENGTH_SHORT).show();
-		
-		// Loads tasks and locations from database
+		// Load tasks and locations from database
 		loadDataFromDB();
 		
 		// Build a list of geofences build from locations that are bound to an active task
 		createGeofencesList();
 		
-		// 
+		// Not working properly right now
 		setDeadlineAlarm();
+		
 		// Build the listviews for active and finished task lists
 		updateListViews();
 		
+		// Set listener for both listsviews
 		setListItemClickListener();		
 		
-		//anim_Move = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.move);
-		
+		// Display number of tasks		
 		updateListTitle();
 		
-		/*
-		// Create the LocationRequest object
-        mLocationRequest = LocationRequest.create();
-        // Use high accuracy
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        // Set the update interval to 5 seconds
-        mLocationRequest.setInterval(UPDATE_INTERVAL);
-        // Set the fastest update interval to 1 second
-        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-
-		mLocationClient = new LocationClient(this, this, this);
-		*/
-//		locationmanager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-//		Criteria criteria = new Criteria();
-//		provider = locationmanager.getBestProvider(criteria, false);
-//		Location myLocation = locationmanager.getLastKnownLocation(provider);
-//		Location mLocation = mLocationClient.getLastLocation();		
 	}
 
 	@Override
@@ -195,6 +158,9 @@ public class MainActivity extends Activity {
 		case R.id.action_settings:
 			return true;
 		*/
+		case R.id.action_manageLocations:
+			openManageLocations();
+			return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -202,9 +168,6 @@ public class MainActivity extends Activity {
 	
 	public void onStart() {
 		super.onStart();
-		//Toast.makeText(this, "Main onStart called", Toast.LENGTH_SHORT).show();
-		//mLocationClient.connect();
-		
 		/*
          * Record the request as an ADD. If a connection error occurs, the app can automatically restart 
          * the add request if Google Play services can fix the error
@@ -229,30 +192,11 @@ public class MainActivity extends Activity {
 	
 	public void onResume() {
 		super.onResume();
-		//locationmanager.requestLocationUpdates(provider, 400, 1, this);
 		if (mGeofenceRequester != null) {
 			mGeofenceRequester.getLocation();
-		}
-		//Toast.makeText(this, "Main onResume called", Toast.LENGTH_SHORT).show();
+		}		
 	}
-	
-	public void onPause() {
-		super.onPause();
-		//locationmanager.removeUpdates(this);
-		// should we do some saving operations here?
-		//Toast.makeText(this, "Main onPause called", Toast.LENGTH_SHORT).show();
-	}
-	
-	public void onStop() {		
-        /*
-         * After disconnect() is called, the client is
-         * considered "dead".
-         */
-        //mLocationClient.disconnect();		
-		//Toast.makeText(this, "Main onStop called", Toast.LENGTH_SHORT).show();
-		super.onStop();
-	}
-	
+		
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         //super.onActivityResult(requestCode, resultCode, intent);
@@ -306,21 +250,15 @@ public class MainActivity extends Activity {
                 
             case MyConstants.REQUESTCODE_SETTASK: {
             	
-            	switch(resultCode) {
-            	
+            	switch(resultCode) {            	
             		case RESULT_OK:
-            			// get Data from AddNewToDo
-            			//intent.getExtras().get()
+            			
+            			// Just reload from DB
             			loadDataFromDB();
             			updateListViews();
             			updateListTitle();
-            		break;
-            		case RESULT_FIRST_USER:
-            			// Abuse this result code to delete elements
-            			loadDataFromDB();
-            			updateListViews();
-            			updateListTitle();
-            		break;
+            			
+            		break;            		
             	}
             }
 
@@ -334,19 +272,16 @@ public class MainActivity extends Activity {
         }
     }
 	
+	/**
+	 * Load all needed data from DB, create two lists for active/finished
+	 */
 	private void loadDataFromDB() {
 		
-		// Get Global State Singleton
-		//gs = (GlobalState) getApplication();
 		// Get the handler for the database 
 		dbHandler = new DBHandler(this);
 		
 		// Instantiate database
 		dbHandler.open();
-		
-		// Instantiate testdata
-		//testData = new TestData();
-		
 		
 		//  Read all tasks from database 
 		tasks = dbHandler.getAllTasks();			
@@ -355,11 +290,12 @@ public class MainActivity extends Activity {
 		if (tasks == null) {
 			tasks = new ArrayList<Task>();
 		}
-		// Fill the lists for active and passive tasks from all tasks list
 		
+		// Fill the lists for active and passive tasks from all tasks list		
 		// Reset the lists
 		active_tasks = new ArrayList<Task>();
 		finished_tasks = new ArrayList<Task>();
+		// The field isActive decides where to put
 		for (Task tmpTask: tasks) {			
 			if(tmpTask.isActive)				   
 			    active_tasks.add(tmpTask);
@@ -367,7 +303,7 @@ public class MainActivity extends Activity {
 				finished_tasks.add(tmpTask);
 		}
 		
-		// Get the locations
+		// Read all locations
 		locations = dbHandler.getAllLocations();	
 		
 		// No locations found
@@ -375,6 +311,7 @@ public class MainActivity extends Activity {
 			locations = new ArrayList<MyLocation>();
 		}
 		
+		// Debugging
 		List<String> taskloc = dbHandler.getAllTasksLocations();
 		for(Task t:tasks) {
 			Log.d("DB Tasks", ""+t.id+" "+t.name+" "+t.deadline+" "+t.deadline_alert+" "+t.isActive+" "+t.color+" "+t.notes);
@@ -389,7 +326,11 @@ public class MainActivity extends Activity {
 		
 	}
 	
+	/**
+	 * Build geofences from locations bound to active tasks
+	 */
 	private void createGeofencesList() {
+		
 		// Instantiate a Geofence requester
         mGeofenceRequester = new GeofenceRequester(this);
 
@@ -405,7 +346,7 @@ public class MainActivity extends Activity {
 		for(Task task: active_tasks) {
 			task_locations = dbHandler.getLocationsToTask(task.id);
 			for(MyLocation location: task_locations) {
-				// Radius of 0.0 not allowed so we have to sort out location without range 0
+				// Radius of 0.0 not allowed so we have to sort out location with range 0
 				if (location.range != 0) {
 					mCurrentGeofences.add(new Geofence.Builder()
 								.setRequestId(String.valueOf(task.name+" - "+location.name))
@@ -420,7 +361,9 @@ public class MainActivity extends Activity {
 		
 	}
 	
-	public void updateListViews() {
+	// This method seems to be replacable by notifydatasetchange...
+	private void updateListViews() {
+		
 		// Get the listviews
 		active_tasks_lv = (ListView)findViewById(R.id.active_tasks_list);
 		finished_tasks_lv = (ListView)findViewById(R.id.finished_tasks_list);
@@ -434,14 +377,14 @@ public class MainActivity extends Activity {
 		finished_tasks_lv.setAdapter(finished_adapter);
 	} 
 	
-	public void setListItemClickListener() {
+	private void setListItemClickListener() {
+		
 		// For the active tasks list
 		active_tasks_lv.setOnItemClickListener(new OnItemClickListener() {
 			// Call activity to edit chosen active task
 			@Override			
 			public void onItemClick(AdapterView<?> l, View v, int position, long id) {
-				chosenTask = (Task)active_tasks_lv.getItemAtPosition(position);
-				//v.startAnimation(anim_Move);
+				chosenTask = (Task)active_tasks_lv.getItemAtPosition(position);				
 				editTask();
 			}
 		});
@@ -457,80 +400,110 @@ public class MainActivity extends Activity {
 		});
 	}
 	
+	/**
+	 * Shift a task from active to finished and vice versa
+	 * @param pos	Position in the list
+	 * @param list	Active or finished
+	 */
 	public void shiftItem(int pos, int list){
+		
 		// Remove task from active list and add to finished list
 		Task t;
 		if(list == ACTIVE_TASKS_LIST){
-			// DB update
+			
+			// DB update because of change in field isActive
 			t = (Task)active_tasks.get(pos);
 			dbHandler.updateTasks(t.id, t.name, t.deadline, t.deadline_alert, 0, t.color, t.notes);
+			
 			// Visual update
 			finished_tasks.add(active_tasks.remove(pos));
 		}
+		
 		// Remove task from finished list and add to active list
 		else{
-			// DB update
+			
+			// DB update  because of change in field isActive
 			t = (Task)finished_tasks.get(pos);
 			dbHandler.updateTasks(t.id, t.name, t.deadline, t.deadline_alert, 1, t.color, t.notes);
+			
 			// Visual update
 			active_tasks.add(finished_tasks.remove(pos));
 		}
+		
+		// The number of tasks has changed in both lists
 		updateListTitle();
 		active_adapter.notifyDataSetChanged();
 		finished_adapter.notifyDataSetChanged();
 	}
 	
-	public void updateListTitle() {
+	/**
+	 * Refresh the titles for lists whenever a change occurs
+	 */
+	private void updateListTitle() {
+		
 		active_listTitle = (TextView)findViewById(R.id.active_tasks_title);
+		// Could be outsourced to res/strings
 		active_listTitle.setText(active_tasks.size() + " tasks to do");
+		
+		// If there is no task in the active list we add some space between for a better look 
 		View v = (View)findViewById(R.id.invisible_space);
 		if (active_tasks.size() == 0) {			
 			v.setVisibility(View.VISIBLE);
 		}
 		else
 			v.setVisibility(View.GONE);
+		
 		finished_listTitle = (TextView)findViewById(R.id.finished_tasks_title);
 		finished_listTitle.setText(finished_tasks.size() + " tasks finished");
 	}
 	
-	
-	
-	// propagate changes to global state
-//		private void updateGlobalState() {
-//			gs.setToDoList(tasks);
-//			gs.setLocationList(locations);
-//			gs.setActiveToDoList(active_tasks);
-//			gs.setFinishedToDoList(finished_tasks);
-//			gs.setChosenToDo(chosenToDo);
-//		}
-		
-	public void addNewTask() {
-		// No data to send, to ensure that no other data exist assign NULL here
+	/**
+	 * 	Jumps to SetTask to create a new task
+	 */
+	private void addNewTask() {
+		// No data to send, to ensure that no other data exist when we jump back assign NULL here
 		chosenTask = null;		
 		
+		// Create intent for the activity
 		Intent intent = new Intent(getApplicationContext(), SetTaskActivity.class);
+		
+		// Send the operating mode
 		intent.putExtra(MyConstants.OPERATING_MODE, MyConstants.MODE_ADD);
+		
 		startActivityForResult(intent, MyConstants.REQUESTCODE_SETTASK);
 	}
 	
-	public void editTask() {
+	/**
+	 * 	Jumps to Manage Locations
+	 */
+	private void openManageLocations() {
+		
+		// Create intent for the activity
+		Intent intent = new Intent(getApplicationContext(), ManageLocationActivity.class);		
+		startActivity(intent);
+	}
+	
+	/**
+	 * Jumps to SetTask to edit an existing task
+	 */
+	private void editTask() {
 		
 		// Create intent for new activity to edit task
 		Intent intent = new Intent(getApplicationContext(), SetTaskActivity.class);
 		
-		// Set operating mode for SetTaskActivity 
+		// Send operating mode for SetTaskActivity 
 		intent.putExtra(MyConstants.OPERATING_MODE, MyConstants.MODE_EDIT);
 		
-		// Only send the ID of the chosen task and reload the task in the other activity
-		intent.putExtra(MyConstants.TASK_ID, chosenTask.id);		
+		// Only send the ID of the chosen task and reload the task from DB in the other activity
+		intent.putExtra(MyConstants.TASK_ID, chosenTask.id);
+		
 		startActivityForResult(intent, MyConstants.REQUESTCODE_SETTASK);
 	}
 
 	 private boolean servicesConnected() {
 
 	        // Check that Google Play services is available
-	        int resultCode =
-	                GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+	        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
 	        // If Google Play services is available
 	        if (ConnectionResult.SUCCESS == resultCode) {
@@ -556,52 +529,80 @@ public class MainActivity extends Activity {
 	        }
 	    }
 	 
-	 public void setDeadlineAlarm() {		 
-			for(Task task: active_tasks) {				
-					if (task.deadline_alert != 0) {
+	 /**
+	  * Set the deadline alarm for every active task
+	  */
+	 private void setDeadlineAlarm() {		 
+			for(Task task: active_tasks) {
 					
-						Intent intentAlarm = new Intent(this, DeadlineAlarmReceiver.class);
-						intentAlarm.putExtra(MyConstants.TASK_NAME, task.name);
-			            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-			            
-			            // Time is calculated 
-			            long time = task.deadline-task.deadline_alert;
-			           
-			            // Set the alarm for particular time
-			            alarmManager.set(AlarmManager.RTC_WAKEUP,time, PendingIntent.getBroadcast(this,1,  intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
-			            long now = (new Date().getTime());
-			            Log.d("ALARM SET NOW" , ""+ now);
-			            Log.d("ALARM SET TIME" , ""+ time);
-			            Log.d("ALARM SET DIFF" , ""+ (now-time));
+				// If an alert time exist
+				if (task.deadline_alert != 0) {
+					
+					Intent intentAlarm = new Intent(this, DeadlineAlarmReceiver.class);
+					intentAlarm.putExtra(MyConstants.TASK_NAME, task.name);
+		            
+					AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+		            
+		            // Alarm Time is calculated 
+		            long time = task.deadline-task.deadline_alert;
+		           
+		            // Set the alarm for particular time
+		            alarmManager.set(AlarmManager.RTC_WAKEUP,time, PendingIntent.getBroadcast(this,1,  intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+		            
+		            // Debbugging
+		            long now = (new Date().getTime());
+		            Log.d("ALARM SET NOW" , ""+ now);
+		            Log.d("ALARM SET TIME" , ""+ time);
+		            Log.d("ALARM SET DIFF" , ""+ (now-time));
 				}
 			}
 				
 	 }
 	 
+	 /**
+	  * Clear all tables - mostly for debugging
+	  * @param v 	Button to be clicked
+	  */
 	 public void clearTables(View v) {
 		 //dbHandler.clearTasks();
-		// dbHandler.clearLocations();
+		 //dbHandler.clearLocations();
 		 dbHandler.clearTasks_Locations();
 		 Toast.makeText(getApplicationContext(), "Table cleared", Toast.LENGTH_SHORT).show();
 	 }
 	 
+	 /**
+	  * Sort the task by the distance of the nearest bound location. 
+	  * Tasks without location will be aligned at the bottom
+	  * @param item 	Actionbar item to be clicked
+	  */
 	 public void sortActiveTasks(MenuItem item) {
-		 calculateDistances();
+		 
+		 // First we calculate the distances new if location has changed
+		 calculateDistances();		 
+		 
 		 List<Task> tmpList = new ArrayList<Task>();
 		 int pos = 0;
 		 int length = active_tasks.size();
 		 for (int i = 0; i<length;i++) {
+			 
+			 // Get the task with nearest location
 			 pos = getMinFromList(distancesToMe);
+			 
+			 // Rebuild the list - nearest on top
 			 tmpList.add(i, active_tasks.remove(pos));
 			 distancesToMe.remove(pos);
 			 
 		 }
+		 
 		 active_tasks = tmpList;
 		 updateListViews();
 		 updateListTitle();
 		 active_adapter.notifyDataSetChanged();
 	 }
 	 
+	 /**
+	  * This calculates the distance from the nearest bound location every task and stores them in a list
+	  */
 	 private void calculateDistances() {
 		 
 		 distancesToMe = new ArrayList<Integer>();
@@ -610,31 +611,44 @@ public class MainActivity extends Activity {
 		 List<MyLocation> tmp_locs;
 		 int i = 0;
 		 int distance = 0;
+		 
+		 // If there are no tasks or our position is unknown
 		 if ((active_tasks.size() != 0) && (MainActivity.mLocation != null)) {
+			 
 			 for(Task t:active_tasks) {
+				 
 				 tmp_locs = dbHandler.getLocationsToTask(t.id);
+				 
+				 // Index needed if there is more than one location
 				 int j = 0;
+				 
 				 if (tmp_locs.size() != 0) {
 					 for(MyLocation mLoc:tmp_locs) {
-						location = new Location("");
-						location.setLatitude(mLoc.lat);
-						location.setLongitude(mLoc.lng);
-						// Calculate distance for this location
-						distance = (int)location.distanceTo(MainActivity.mLocation);
-						// For more than one locations compare the distances
-						if (j>0) {
-							// Replace distance if smaller
+						 
+						 // Create a location obejct
+						 location = new Location("");
+						 location.setLatitude(mLoc.lat);
+						 location.setLongitude(mLoc.lng);
+						
+						 // Calculate distance to this location
+						 distance = (int)location.distanceTo(MainActivity.mLocation);
+						 
+						 // For more than one location - compare the distances
+						 if (j>0) {
+							
+							 // Replace distance if smaller
 							if (distance < distancesToMe.get(i)) {
 								distancesToMe.set(i, distance);
 							}							
-						}
-						// No value existed before
-						else {
+						 } 
+						 // No value existed before - only one location
+						 else {
 							distancesToMe.add(distance);
-						}
-						j++;
+						 }
+						 j++;
 					 }
 				 }
+				 
 				 // If no location exist we assign a MaxInteger as distance to location
 				 else {
 					 distancesToMe.add(Integer.MAX_VALUE); 
@@ -644,7 +658,12 @@ public class MainActivity extends Activity {
 		 }
 	 }
 	 
-	 private int getMinFromList(List<Integer> list) {
+	 /**
+	  * Get the index of the smallest item in a list
+	  * @param list		The distances list
+	  * @return			The position of the item
+	  */
+	 static int getMinFromList(List<Integer> list) {
 		 int index = 0;
 		 int small = (int)list.get(index); 
 		 for (int i=1;i<list.size(); i++) {

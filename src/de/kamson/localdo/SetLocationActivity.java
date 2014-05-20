@@ -21,6 +21,7 @@ import de.kamson.data.MyConstants;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -43,14 +44,20 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.Toast;
-
+/**
+ * Add, edit and delete a location here
+ * @author all
+ *
+ */
 public class SetLocationActivity extends Activity {
 	Context mContext;
 	Intent intent;
 	DBHandler dbHandler;	
-	static final LatLng MANNHEIM_SCHLOSS = new LatLng(49.48325, 8.462);
+	DialogFragment df;
 	
-	// Map variables
+	/*
+	 * Map variables
+	 */
 	private GoogleMap mMap;
 	private Marker mMarker;
 	private Circle mCircle;
@@ -62,13 +69,20 @@ public class SetLocationActivity extends Activity {
 	private CustomInfoWindowAdapter iwAdapter;
 	private LatLng mLatLng;
 	
-	// UI variables
+	static final LatLng MANNHEIM_SCHLOSS = new LatLng(49.48325, 8.462);
+	
+	/*
+	 * UI variables
+	 */
 	EditText et_locationName;
 	EditText et_locationAddress;
 	CheckBox cb_addLocation;
 	CheckBox cb_addLocationAlert;
 	Spinner spinner_locationRanges;
 	
+	/*
+	 * List variables
+	 */
 	MyLocation location;
 	List<Task> location_tasks;
 	
@@ -78,10 +92,11 @@ public class SetLocationActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_set_location);
-		//Toast.makeText(this, "SetLocation onCreate called", Toast.LENGTH_SHORT).show();
+		
 		mContext = getApplicationContext();
 		intent = getIntent();
 		
+		// Load location from DB
 		loadDataFromDB();
 		
 		// Show the Up button in the action bar.
@@ -90,26 +105,11 @@ public class SetLocationActivity extends Activity {
 		// UI
 		et_locationName = (EditText)findViewById(R.id.location_name);
 		et_locationAddress = (EditText)findViewById(R.id.location_address);
-		cb_addLocation = (CheckBox)findViewById(R.id.setLocation_cb_addLocationToList);
-		//cb_addLocationAlert = (CheckBox)findViewById(R.id.setLocation_cb_setAlert);
-		//spinner_locationRanges = (Spinner)findViewById(R.id.setLocation_spinner_distances);
-//		spinner_locationRanges.setOnItemSelectedListener(new OnItemSelectedListener() {
-//
-//			@Override
-//			public void onItemSelected(AdapterView<?> arg0, View arg1,
-//					int arg2, long arg3) {
-//				// TODO Auto-generated method stub
-//				
-//			}
-//
-//			@Override
-//			public void onNothingSelected(AdapterView<?> arg0) {
-//				// TODO Auto-generated method stub
-//				
-//			}
-//		});
+		cb_addLocation = (CheckBox)findViewById(R.id.setLocation_cb_addLocationToList);		
 		
+		// Set the views
 		fillInData();
+		
 		// Add map
 		setUpMap();
 		
@@ -148,6 +148,8 @@ public class SetLocationActivity extends Activity {
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
 			//NavUtils.navigateUpFromSameTask(this);
+			
+			// We don't need the up button here
 			backToSetTask(MyConstants.ACTION_CANCEL);
 			return true;
 		case R.id.action_accept:		
@@ -157,54 +159,58 @@ public class SetLocationActivity extends Activity {
 			backToSetTask(MyConstants.ACTION_CANCEL);
 			return true;
 		case R.id.action_discard:			
-			backToSetTask(MyConstants.ACTION_DISCARD);
+			// Location can be safely removed when no tasks exist		
+			if (location_tasks.size() == 0)
+				backToSetTask(MyConstants.ACTION_DISCARD);
+			// Deletion cannot be performed because there a still tasks bound
+			else {
+				df = new MyDialogFragment().newInstance("Deletion denied - Location still bound to another task");				
+				df.show(getFragmentManager(), "AnonymousDialog");
+			}
 			return true;		
 		}
 		return super.onOptionsItemSelected(item);
 	}	
 	
-	
-	public void backToSetTask(int action) {
+	/**
+	 * Jump back to SetTask after updating DB
+	 * @param action
+	 */
+	private void backToSetTask(int action) {
 		Intent intent = new Intent();
 		switch (action) {
 			case MyConstants.ACTION_DISCARD:
+						
+				// Sending back ID of deleted location
+				intent.putExtra(MyConstants.LOCATION_ID, location.id);
 				
-				// Location can be safely removed when no tasks exist
-				if (location_tasks.size() == 0) {
-					
-					// Sending back ID of deleted location
-					intent.putExtra(MyConstants.LOCATION_ID, location.id);
-					
-					// Delete task from database here
-					dbHandler.deleteLocation(location.id);
-					Toast.makeText(getApplicationContext(), "Location with ID "+location.id+" deleted", Toast.LENGTH_SHORT).show();					
-				}
-				// Alert that remove operation cannot be performed
-				else {				
-					Toast.makeText(getApplicationContext(), "Deletion denied - Location still bound to another task", Toast.LENGTH_SHORT).show();
-				}
+				// Delete task from database here
+				dbHandler.deleteLocation(location.id);
+				
 				setResult(RESULT_CANCELED, intent);				
 				break;
 			case MyConstants.ACTION_ACCEPT:	
 				// For now no correctness check of user input
 				readUserInput();
+				
 				long id = location.id;
 				String name = location.name;
 				double latitude = location.lat;
 				double longitude = location.lng;
 				int range = location.range;
 				int anonymous = location.isAnonymous ? 1 : 0;				
+				
 				// No location ID existed before means new location
 				if (location.id == -1) {
 					id = dbHandler.createLocation(name, latitude, longitude, range, anonymous);
-					Toast.makeText(getApplicationContext(), "Location created", Toast.LENGTH_SHORT).show();
+					
 				}
 				
 				// Location ID existed so we can update the database
 				else {
 					id = location.id;
 					dbHandler.updateLocations(id, name, latitude, longitude, range, anonymous);
-					Toast.makeText(getApplicationContext(), "Location updated", Toast.LENGTH_SHORT).show();
+					
 				}
 				
 				// Sending back ID of new or updated task
@@ -220,6 +226,9 @@ public class SetLocationActivity extends Activity {
 		finish();
 	}
 	
+	/**
+	 * Read location and all tasks that this location is bound to from DB
+	 */
 	private void loadDataFromDB() {
 		
 		intent = getIntent();
@@ -248,6 +257,9 @@ public class SetLocationActivity extends Activity {
 		}		
 	}
 	
+	/**
+	 * Read the views to fill location fields
+	 */
 	private void readUserInput() {
 		
 		// Check if user entered a personal name for the new location
@@ -267,11 +279,13 @@ public class SetLocationActivity extends Activity {
 		// Field set in InfoWindow
 		location.range = mRadius;
 		
-		//
-		
+		// Opposite value of the CB
 		location.isAnonymous = !cb_addLocation.isChecked();
 	}
 	
+	/**
+	 * Adds a map 
+	 */
 	private void setUpMap() {
 	    // Do a null check to confirm that we have not already instantiated the map.
 	    if (mMap == null) {
@@ -302,28 +316,38 @@ public class SetLocationActivity extends Activity {
 					public void onMapClick(LatLng point) {
 						// TODO Auto-generated method stub
 						mAddress = getAddress(point);
+						
+						// A click on the map shows the address of the clicked point
 						et_locationAddress.setText(mAddress);
+						
 						mLat = point.latitude;
 						mLng = point.longitude;
+						
+						// Replace the marker
 						mMarker.remove();
 						iwAdapter.setTitle(mAddress);
 						iwAdapter.setRadius(mRadius);						
 						mMarker = mMap.addMarker(new MarkerOptions().position(point));
 						mMarker.showInfoWindow();
 						mCircle.setCenter(point);
+						
+						// Reset the view on the map
 						mMap.animateCamera(CameraUpdateFactory.newLatLng(point));
 					}
 				});
 	        	
+	        	// User can edit his range by clicking on InfoWindow
 	        	mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
 					
 					@Override
 					public void onInfoWindowClick(Marker marker) {
 						// TODO Auto-generated method stub
+						
 						final EditText et_input = new EditText(getApplicationContext());
 						et_input.setInputType(InputType.TYPE_CLASS_NUMBER);
 						et_input.setText(String.valueOf(mRadius));
 						et_input.setTextColor(0xff000000);
+						// Needs more formatting ?
 						et_input.setBackgroundColor(0x00000000);
 						new AlertDialog.Builder(SetLocationActivity.this)
 					    .setTitle("Change Radius in m")
@@ -344,11 +368,19 @@ public class SetLocationActivity extends Activity {
 						
 					}
 				});
+	        	
+	        	// Show the address on map 
 	        	mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLatLng, 15));
 	        }
 	    }
 	}
 	
+	
+	/**
+	 * Gets the address to Location by using the geocoder
+	 * @param point	Clicked on map or given from DB
+	 * @return	Formatted address string
+	 */
 	private String getAddress(LatLng point) {
 		Geocoder geocoder = new Geocoder(this, Locale.getDefault());		
 		List <Address> addresses = null;
@@ -397,6 +429,9 @@ public class SetLocationActivity extends Activity {
 		
 	}
 	
+	/**
+	 * Sets the views from loaded location
+	 */
 	private void fillInData() {
 		
 		if (location.id != -1) {
@@ -406,14 +441,18 @@ public class SetLocationActivity extends Activity {
 			mLat = location.lat;
 			mLng = location.lng;
 			mRadius = location.range;
+			
 			// If location is anonymous then uncheck checkbox
 			cb_addLocation.setChecked(!location.isAnonymous);
 		}
+		
 		// If New Location was chosen, get user location that was requested in MainActivity  	
 		else if(operating_mode == MyConstants.MODE_ADD) {
     		if (MainActivity.mLocation != null) {
     			mLatLng = new LatLng(MainActivity.mLocation.getLatitude(), MainActivity.mLocation.getLongitude());
     		}
+    		
+    		// If the own position could not be retrieved the MANNHEIM SCHLOSS will be set as default
     		else {
     			mLatLng = MANNHEIM_SCHLOSS;    			
     		}

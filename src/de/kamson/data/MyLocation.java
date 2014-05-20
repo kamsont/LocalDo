@@ -29,4 +29,8 @@ public class MyLocation {
 		else
 			return false;
 	}
+	
+	public String toString() {
+		return this.name;
+	}
 }

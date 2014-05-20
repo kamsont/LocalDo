@@ -165,16 +165,13 @@ public class GeofenceRequester
         // Send a request to add the current geofences
         if (mCurrentGeofences.size() != 0) {
         	mLocationClient.addGeofences(mCurrentGeofences, mGeofencePendingIntent, this);
-        	
-            Toast.makeText(mActivity, mCurrentGeofences.size()+" Geofences added", Toast.LENGTH_SHORT).show();
         }
     }
     
     public void getLocation() {
     	 // Request current location
         if (mLocationClient.isConnected()) {
-	    	MainActivity.mLocation = mLocationClient.getLastLocation();
-	        Toast.makeText(mActivity, "Own position found", Toast.LENGTH_SHORT).show();
+	    	MainActivity.mLocation = mLocationClient.getLastLocation();	       
         }
         else {
         	//Toast.makeText(mActivity, "Could not find own position", Toast.LENGTH_SHORT).show();

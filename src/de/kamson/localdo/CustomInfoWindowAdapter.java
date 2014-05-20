@@ -8,7 +8,11 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.model.Marker;
-
+/**
+ * To show a InfoWindow in the map
+ * @author all
+ *
+ */
 public class CustomInfoWindowAdapter implements InfoWindowAdapter{
 
 	Context context;

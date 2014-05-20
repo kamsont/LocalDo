@@ -47,13 +47,19 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.support.v4.app.NavUtils;
 import android.text.format.DateFormat;
-
+/**
+ * Add and edit and delete a task here
+ * @author all
+ *
+ */
 public class SetTaskActivity extends Activity {
 
 	static Context mContext;
-	Intent intent;
+	Intent intent;	
 	
 	DBHandler dbHandler;
+	DialogFragment df;
+	
 	/*
 	 * UI Variables
 	 */
@@ -69,15 +75,18 @@ public class SetTaskActivity extends Activity {
 	static EditText et_notes;
 	//static EditText et_clickedLocation;
 	
-	DialogFragment df;
 	
+	// To tag anonymous editviews 
 	int tag;
+	
+	/*
+	 * List variables
+	 */
 	static Task task;
 	static MyLocation location;
 	List<MyLocation> new_locations;
 	static List<MyLocation> task_locations;
-	static List<MyLocation> all_locations;
-	
+	static List<MyLocation> all_locations;	
 	static List<MyLocation> choiceList;
 	
 	private int operating_mode;
@@ -90,7 +99,7 @@ public class SetTaskActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//Toast.makeText(this, "SetTask onCreate called", Toast.LENGTH_SHORT).show();
+		
 		mContext = getApplicationContext();
 		intent = getIntent();
 		
@@ -117,6 +126,7 @@ public class SetTaskActivity extends Activity {
 		//final EditText et_location = (EditText)findViewById(R.id.setTask_location); //onClickListener ist in xml
 		et_notes = (EditText)findViewById(R.id.setTask_notes);
 		
+		// In edit mode get the loaded data into the views
 		fillInData();
 		
 		
@@ -157,65 +167,75 @@ public class SetTaskActivity extends Activity {
 			//			
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
-		case R.id.action_accept:
-			Toast.makeText(getApplicationContext(), "Save Task", Toast.LENGTH_SHORT).show();
+		case R.id.action_accept:			
+			
+			// If no name is set than show hint but do nothing
 			if (et_taskName.getText().length() == 0) {				
 				df = new MyDialogFragment().newInstance("Please give your task a name");				
 				df.show(getFragmentManager(), "AnonymousDialog");
-			}
+			}			
 			else {
 				backToMain(MyConstants.ACTION_ACCEPT);
 			}
 			return true; 
-		case R.id.action_cancel:
-			Toast.makeText(getApplicationContext(), "Abort", Toast.LENGTH_SHORT).show();
+		case R.id.action_cancel:			
 			backToMain(MyConstants.ACTION_CANCEL);
 			return true;
 			// Not available
-//		case R.id.action_edit:			
-//			Toast.makeText(getApplicationContext(), "Edit Task", Toast.LENGTH_SHORT).show();
+//		case R.id.action_edit:
 //			openMain(-1);
 //			return true;
-		case R.id.action_discard:
-			Toast.makeText(getApplicationContext(), "Delete Task", Toast.LENGTH_SHORT).show();
+		case R.id.action_discard:			
 			backToMain(MyConstants.ACTION_DISCARD);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}	
-		
-	public void backToMain(int action) {
+	
+	/**
+	 * Jump back to MainActivity after committing changes to DB
+	 * @param action
+	 */
+	private void backToMain(int action) {
 		Intent intent = new Intent();
 		switch (action) {
 			case MyConstants.ACTION_DISCARD:
+				
 				// Sending back ID of deleted task
 				intent.putExtra(MyConstants.TASK_ID, task.id);
+				
+				// Will not be used because when Main reloads everything new
 				intent.putExtra(MyConstants.TASK_ISACTIVE, task.isActive);
+				
 				// Delete task from database here
 				dbHandler.deleteTask(task.id);
-				Toast.makeText(getApplicationContext(), "Task deleted", Toast.LENGTH_SHORT).show();
+				
 				setResult(RESULT_OK, intent);				
 				break;
-			case MyConstants.ACTION_ACCEPT:				
+			case MyConstants.ACTION_ACCEPT:
+				
 				long id = -1;
+				
 				// For now no correctness check of user input
 				readUserInput();
+				
 				String name = task.name;
 				long deadline = task.deadline;
 				long deadline_alert = task.deadline_alert;
+				// Reformat to int for SQL
 				int active = task.isActive ? 1 : 0;					
 				int color = task.color;
 				String notes = task.notes;
+				
 				// No task ID existed before means new task
 				if (task.id == -1) {
-					id = dbHandler.createTask(name, deadline, deadline_alert, active, color, notes);
-					Toast.makeText(getApplicationContext(), "Task created", Toast.LENGTH_SHORT).show();
+					id = dbHandler.createTask(name, deadline, deadline_alert, active, color, notes);					
 				}
+				
 				// Task ID existed so we can update the database
 				else {
 					id = task.id;
-					dbHandler.updateTasks(id, name, deadline, deadline_alert, active, color, notes);
-					Toast.makeText(getApplicationContext(), "Task updated", Toast.LENGTH_SHORT).show();
+					dbHandler.updateTasks(id, name, deadline, deadline_alert, active, color, notes);					
 				}
 				
 				// Update task_location table  
@@ -224,13 +244,13 @@ public class SetTaskActivity extends Activity {
 				
 				// Store the changed locations list for this task
 				for (MyLocation loc: task_locations) {
-					dbHandler.createTaskLocation(id, loc.id);
-					Toast.makeText(getApplicationContext(), "Task-Location created", Toast.LENGTH_SHORT).show();
+					dbHandler.createTaskLocation(id, loc.id);					
 				}
 				
 				// Sending back ID of new or updated task
 				intent.putExtra(MyConstants.TASK_ID, id);
 				intent.putExtra(MyConstants.TASK_NAME, task.name);
+				
 				setResult(RESULT_OK, intent);
 				break;
 			case MyConstants.ACTION_CANCEL:
@@ -241,15 +261,20 @@ public class SetTaskActivity extends Activity {
 		finish();
 	}
 	
+	/**
+	 * Not needed anymore
+	 */
 	public void openSetAlert() {
 		Intent intent = new Intent(getApplicationContext(), SetAlertActivity.class);
 		startActivity(intent);
 	}
 	
-	// Remember which field was clicked User clicks on it
+	/**
+	 * A method in between which stores which edittext was clicked
+	 * @param v Edittext that was clicked
+	 */
 	public  void openSetLocation(View v) {
 		tag = (Integer)v.getTag();
-//		String tmp = et_clickedLocation.getHint().toString();
 		showLocationDialog(v);
 	}
 	
@@ -259,13 +284,13 @@ public class SetTaskActivity extends Activity {
 			switch (resultCode) {
 			case RESULT_OK:
 				
+				// Get the location id 
 				long id = data.getLongExtra(MyConstants.LOCATION_ID, -1);
-				// Not needed
-				//String tmp = data.getStringExtra(MyConstants.LOCATION_NAME);				
 				
 				updateLocationLists(id);
 				
 				buildLocationViews();
+				
 				break;
 			case RESULT_CANCELED:
 				all_locations = dbHandler.getAllLocations();
@@ -311,47 +336,54 @@ public class SetTaskActivity extends Activity {
 		new_locations = new ArrayList<MyLocation>();
 		
 		// In any case we will need all locations to display as choice list
-		all_locations = dbHandler.getAllLocations();
-		
-//		String tmp = "TaskID: "+task.id+" -> ";
-//		for(MyLocation loc:all_locations) {			
-//			tmp += loc.id+"-"+loc.name+"-"+loc.lat+"-"+loc.lng+"-"+loc.range+":+:"; 
-//		}
-//		et_notes = (EditText)findViewById(R.id.setTask_notes);
-//		et_notes.setText(tmp);
+		all_locations = dbHandler.getAllLocations();		
+
 	}
 	
-	
-	public void readUserInput() {
+	/**
+	 * Collects data from Views
+	 */
+	private void readUserInput() {
+		
 		task.name = et_taskName.getText().toString();
+		
 		task.deadline = deadlineDate+deadlineTime;
-		//task.deadline_alert already exist
+		
+		// Recheck here - onitemselected could not be triggered
+		if (!cb_alertTime.isChecked())
+			task.deadline_alert = 0;
+		
+		// We assume a new task should be active
 		task.isActive = true;
+		
 		//task.color already exist
+		
 		task.notes = et_notes.getText().toString();
 	}
 	
-	public void showColorSpinnerDialog (View v) {
-		Spinner colorSpinner = (Spinner)findViewById(R.id.setTask_color_spinner); 
-		//Toast.makeText(getApplicationContext(), "spinner", Toast.LENGTH_SHORT).show();
-		colorSpinner.performClick();
-	}
-	
+	/**
+	 * This dialog provides a choice for selectable locations
+	 * @author all
+	 *
+	 */
 	public static class LocationDialogFragment extends DialogFragment {		
 		public Dialog onCreateDialog(Bundle savedInstanceState) { 
+			
 			// Setup the choice list consisting of all locations
 			List<String> tmp = new ArrayList<String>();
 			choiceList = new ArrayList<MyLocation>();
-			// In any case assign the possibility to add a new location as first choice
+			
+			// In any case assign the possibilty to add a new location as first choice
 			tmp.add("New Location");
-			// No location exist
+			
+			// Locations exist
 			if (all_locations.size() != 0) {
 				for (MyLocation location:all_locations) {
-					// No anonymous locations 
+					
+					// No anonymous locations allowed
 					if (!location.isAnonymous) {
-						// Sort out the locations that are already bound to this task
 						
-						
+						// Only take locations that have not been chosen for this task yet						
 						if (!(task_locations.contains(location))) {
 							choiceList.add(location);
 							tmp.add(location.name);							
@@ -359,28 +391,33 @@ public class SetTaskActivity extends Activity {
 					}
 				}
 			}
+			
+			// SetSingleChoiceItems works well with string arrays
 			String[] choices = tmp.toArray(new String[tmp.size()]);
 			
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-			builder.setTitle(R.string.setTask_location_spinner_prompt)
+			builder	.setTitle(R.string.setTask_location_spinner_prompt)
 				.setSingleChoiceItems(choices, 0, new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
-						//((SetTaskActivity)getActivity()).openSetAlert();
+						// TODO Auto-generated method stub						
 						Intent intent = new Intent(mContext, SetLocationActivity.class);
-						if (which == 0) { // 0 = New location						
+						
+						// The first item is the New location choice
+						if (which == 0) {					
 							intent.putExtra(MyConstants.OPERATING_MODE, MyConstants.MODE_ADD);
 						}
-						else {
-							// The choice corresponds to the all locations list so get the location her
-							// The parameter needs to be incremented because of New location on position 1 that does not exist in all locations
+						
+						// The parameter needs to be incremented because of New location on position 1 that 
+						// does not exist in choice list
+						else {							
 							location = choiceList.get(which-1);
 							intent.putExtra(MyConstants.OPERATING_MODE, MyConstants.MODE_EDIT);
 							intent.putExtra(MyConstants.LOCATION_ID, location.id);
 						}
+						
 						getActivity().startActivityForResult(intent, MyConstants.REQUESTCODE_SETLOCATION);
 						dialog.dismiss();
 					}
@@ -389,11 +426,19 @@ public class SetTaskActivity extends Activity {
 		}
 	}
 	
+	/*
+	 * ClickListener for editviews of locations
+	 */
 	public void showLocationDialog(View v) {
 		df = new LocationDialogFragment();
 		df.show(getFragmentManager(), "locationDialog");
 	}
 	
+	/**
+	 * Dialog provides a choice for colors to mark a task
+	 * @author all
+	 *
+	 */
 	public static class ColorDialogFragment extends DialogFragment {		
 		public Dialog onCreateDialog(Bundle savedInstanceState) {  
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -403,9 +448,12 @@ public class SetTaskActivity extends Activity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
+						
 						// Get the colorstring from dialog
+						// Could also parse array in res/strings
 						ListView lv = ((AlertDialog)dialog).getListView();
 						et_color.setText((String)lv.getItemAtPosition(which));
+						
 						// Lookup which color value matches colorstring
 						task.color = MyConstants.STRING_TO_COLOR.get(et_color.getText().toString());
 						dialog.dismiss();
@@ -416,18 +464,26 @@ public class SetTaskActivity extends Activity {
 		}
 	}
 	
+	/*
+	 * ClickListener for editview of color
+	 */
 	public void showColorDialog(View v) {
 		df = new ColorDialogFragment();
 		df.show(getFragmentManager(), "colorDialog");
 	}
 	
+	/**
+	 * Standad-Dialog to pick the time 
+	 * @author all
+	 *
+	 */
 	public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 		
 		public Dialog onCreateDialog(Bundle saveInstanceState) {
 			final Calendar c = Calendar.getInstance();
 			int h = c.get(Calendar.HOUR_OF_DAY);
 			int min = c.get(Calendar.MINUTE);
-			
+			// ABORT-Button?
 			return new TimePickerDialog(getActivity(), this, h, min, DateFormat.is24HourFormat(getActivity()));
 		}
 		
@@ -441,11 +497,20 @@ public class SetTaskActivity extends Activity {
 		}
 	}
 	
+	/**
+	 * Clicklistener for editview for date
+	 * @param v
+	 */
 	public void showTimePickerDialog(View v) {
 		df = new TimePickerFragment();
 		df.show(getFragmentManager(), "timepicker");
 	}
 	
+	/**
+	 * Standard-Dialog to pick the time
+	 * @author all
+	 *
+	 */
 	public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 		
 		public Dialog onCreateDialog(Bundle saveInstanceState) {
@@ -453,7 +518,7 @@ public class SetTaskActivity extends Activity {
 			int y = c.get(Calendar.YEAR);
 			int m = c.get(Calendar.MONTH);
 			int d = c.get(Calendar.DAY_OF_MONTH);
-			
+			// ABORT-Button?
 			return new DatePickerDialog(getActivity(), this, y, m, d);
 		}
 		
@@ -469,11 +534,18 @@ public class SetTaskActivity extends Activity {
 		}
 	}
 	
+	/**
+	 * ClickListener for editview for time
+	 * @param v
+	 */
 	public void showDatePickerDialog(View v) {
 		df = new DatePickerFragment();
 		df.show(getFragmentManager(), "datePicker");
 	}
 	
+	/**
+	 * To show the extra settings to the user to set a alarm for his deadline
+	 */
 	private static void activateDeadlineAlert() {
 		if (task.deadline_alert == 0)
 			cb_alertTime.setChecked(false);
@@ -486,10 +558,17 @@ public class SetTaskActivity extends Activity {
 			public void onItemSelected(AdapterView<?> arg0, View arg1,
 					int arg2, long arg3) {
 				// TODO Auto-generated method stub
-				//Toast.makeText(mContext, arg0.getItemAtPosition(arg2) + "selected", Toast.LENGTH_SHORT).show();
-				// For now set fix to 1h
-				String[] tmp = mContext.getResources().getStringArray(R.array.setAlert_deadlineTimes_array);
-				task.deadline_alert = MyConstants.STRING_TO_DEADLINETIME.get(tmp[arg2]);
+				// To allow an alarm the checkbox must be checked
+				if (cb_alertTime.isChecked()) {
+					
+					// Get the string from res/string
+					String[] tmp = mContext.getResources().getStringArray(R.array.setAlert_deadlineTimes_array);
+					
+					// Lookup for this string
+					task.deadline_alert = MyConstants.STRING_TO_DEADLINETIME.get(tmp[arg2]);
+				}
+				else
+				task.deadline_alert = 0;
 			}
 
 			@Override
@@ -500,6 +579,10 @@ public class SetTaskActivity extends Activity {
 		});
 	}
 	
+	/**
+	 * Adds the editviews to add locations to a task. There can be 1 to infinite to allow at least 
+	 * adding the the first location
+	 */
 	private void buildLocationViews() {
 		
 		// Get rid of old views and rebuild
@@ -510,17 +593,20 @@ public class SetTaskActivity extends Activity {
 		// What if task_locations.size() == 0? -> null?
 		if (task_locations != null) {
 			locationsCount = task_locations.size();
-			// One column for the EditText and one for the button
-					
+			 
 				// Add one EditText for one location plus one last for "Add Location"
 				for (int i = 0; i<locationsCount+1; i++) {
+					
+					// Layout to take to views in one line
 					LinearLayout ll_tmp = new LinearLayout(mContext);
 					ll_tmp.setOrientation(LinearLayout.HORIZONTAL);
+					
 					// Instantiate new EditText
 					EditText et_tmp = new EditText(mContext);
 					
 					et_tmp.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1));
 					
+					// Will need more format?
 					et_tmp.setBackgroundColor(0x00000000);
 					
 					// Set color
@@ -537,7 +623,8 @@ public class SetTaskActivity extends Activity {
 					
 					// Tag the view to identify it afterwards
 					et_tmp.setTag(i);
-					// Deactivate keyboard
+					
+					// Deactivate keyboard because we jump to another activity
 					et_tmp.setFocusableInTouchMode(false);
 					
 					// Add listener
@@ -546,12 +633,15 @@ public class SetTaskActivity extends Activity {
 						@Override
 						public void onClick(View v) {
 							// TODO Auto-generated method stub
+							
 							openSetLocation(v);
 						}
 					});
 					
 					// Add Editview to the ViewGroup holding bound location names						
 					ll_tmp.addView(et_tmp);
+					
+					// Adds the delete button to get rid of location
 					if (i != locationsCount) {
 						Button btn_tmp = new Button(mContext);
 						btn_tmp.setTag(i);
@@ -564,6 +654,7 @@ public class SetTaskActivity extends Activity {
 							public void onClick(View v) {
 								// TODO Auto-generated method stub
 								int pos = (Integer)v.getTag();
+								// Update list
 								task_locations.remove(pos);								
 								buildLocationViews();
 							}
@@ -575,8 +666,11 @@ public class SetTaskActivity extends Activity {
 			}				
 	}
 	
+	/**
+	 * Fill in the read data from DB into fields
+	 */
 	private void fillInData() {
-		// Fill in task data into fields		
+				// If there is data
 				if (task.id != -1){			
 					
 					// Set task title
@@ -584,6 +678,8 @@ public class SetTaskActivity extends Activity {
 					
 					// Set Deadline
 					long deadline = task.deadline;			
+					
+					// Deadline needs special treatment because of its partial invisibility
 					if(deadline != 0) {
 						GregorianCalendar cal = new GregorianCalendar();
 						cal.setTimeInMillis(task.deadline);
@@ -591,14 +687,17 @@ public class SetTaskActivity extends Activity {
 						deadlineDate = task.deadline-deadlineTime;
 						// Date
 						et_deadlineDate.setText(DateFormat.getDateFormat(getApplicationContext()).format(new Date(deadline)));				
+						
+						
 						// Time
 						et_deadlineTime.setText(DateFormat.getTimeFormat(getApplicationContext()).format(new Date(deadline)));
+						
 						// reset layout for deadline
 						et_deadlineDate.setLayoutParams(new LinearLayout.LayoutParams(0,LayoutParams.WRAP_CONTENT, 1));
 						et_deadlineTime.setLayoutParams(new LinearLayout.LayoutParams(0,LayoutParams.WRAP_CONTENT, 1));
 						et_deadlineTime.setVisibility(View.VISIBLE);
-						// Checkbox set checked
-						cb_alertTime.setChecked(true);
+						
+						// Show extra options
 						activateDeadlineAlert();
 					}					
 					
@@ -609,8 +708,12 @@ public class SetTaskActivity extends Activity {
 				buildLocationViews();
 	}
 	
+	/**
+	 * Update current list of bound locations
+	 * @param id	Locations that was added/edited
+	 */
 	private void updateLocationLists(long id) {
-		// Update task_location list
+		
 		location = dbHandler.getLocation(id);
 		if (task_locations != null) {
 			
@@ -627,12 +730,14 @@ public class SetTaskActivity extends Activity {
 		}
 		// In case there was a deletion in SetLocations
 		all_locations = dbHandler.getAllLocations();
-		for (MyLocation l:task_locations) {
-			Log.d("TASKLOCATIONS", l.id+"-"+l.name);
-		}
-		for (MyLocation l:all_locations) {
-			Log.d("ALL LOCATIONS", l.id+"-"+l.name);
-		}
+		
+		// Debugging
+//		for (MyLocation l:task_locations) {
+//			Log.d("TASKLOCATIONS", l.id+"-"+l.name);
+//		}
+//		for (MyLocation l:all_locations) {
+//			Log.d("ALL LOCATIONS", l.id+"-"+l.name);
+//		}
 	}
 	/*
 	public void onStart() {

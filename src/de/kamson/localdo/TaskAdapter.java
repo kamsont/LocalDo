@@ -28,6 +28,7 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 	int resource;
 	List<Task> objects;
 	DBHandler dbHandler;
+	// We want to request location updates from here
 	GeofenceRequester gfr;
 	
 	
@@ -60,8 +61,11 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 		
 		// Get the locations bound to this task
 		List<MyLocation> task_locations = dbHandler.getLocationsToTask(task.id);
+		
 		// Distances from my position
 		List<Integer> distances = new ArrayList<Integer>();
+		
+		// Calculate distances
 		Location location;
 		gfr.getLocation();
 		if (MainActivity.mLocation != null) {
@@ -72,9 +76,26 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 				distances.add((int)location.distanceTo(MainActivity.mLocation));
 			}
 		}
-		else
-			Log.d("Own Position", "NOT FOUND");
-			gfr.getLocation();
+		
+		// Sort location list by distance - same method as in main for tasks
+		if (distances.size() != 0) {
+			List<MyLocation> tmpList = new ArrayList<MyLocation>();
+			 int pos = 0;
+			 int length = task_locations.size();
+			 for (int i = 0; i<length;i++) {
+				 
+				 // Get nearest location
+				 pos = MainActivity.getMinFromList(distances);
+				 
+				 // Rebuild the list - nearest on top
+				 tmpList.add(i, task_locations.remove(pos));
+				 distances.remove(pos);
+				 
+			 }
+		 
+			 task_locations = tmpList;
+		}
+		
 		// Set Title
 		title.setText(task.name);
 		
@@ -100,14 +121,6 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 			}
 			infos.setText(text);
 		}
-//		// Exactly one location exist
-//		else if (nameCount == 1) {
-//			infos.setText(task_locations.get(0).name);
-//		}
-//		// More than one location exist; display the name of the first one and a hint for the rest
-//		else {
-//			infos.setText(task_locations.get(0).name+" and other locations");
-//		}
 				
 		// Set the color of the bar to the right of each list item
 		colorBar.setBackgroundColor(task.color); 

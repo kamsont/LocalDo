@@ -3,7 +3,11 @@ package de.kamson.data;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+/**
+ * Keeps all global constants
+ * @author all
+ *
+ */
 public class MyConstants {
 	public final static String TASK_ID = "task_id";
 	public final static String TASK_NAME = "task_name";

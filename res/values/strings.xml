@@ -17,6 +17,8 @@
     <string name="title_activity_set_location">Set Location</string>
     <string name="title_activity_set_alert">Set alert</string>
     <string name="title_activity_main">All Tasks</string>
+    <string name="title_activity_manage_locations">Manage Locations</string>
+    <string name="manage_locations_title">Your locations</string>
     <string name="no_resolution">Google Play services: unable to resolve connection error.</string>
     <string name="play_services_available">Location Services is available</string>
     <string name="unknown_activity_request_code">Received an unknown activity request code %1$d in onActivityResult.</string>
